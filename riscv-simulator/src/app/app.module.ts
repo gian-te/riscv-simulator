@@ -1,8 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
+
+import { AppRoutingModule , routes} from './app.routing.module';
 import { AppComponent } from './app.component';
+import { PreloadAllModules, RouterModule } from '@angular/router';
+import { IdeModule } from './feature/ide/ide.module';
+
+// import { AppRoutingModule } from './app.routing.module';
 
 @NgModule({
   declarations: [
@@ -10,7 +15,13 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    IdeModule, // feature module
+    RouterModule.forRoot(routes,
+      {
+        enableTracing: false,
+        preloadingStrategy: PreloadAllModules
+      }), 
   ],
   providers: [],
   bootstrap: [AppComponent]
