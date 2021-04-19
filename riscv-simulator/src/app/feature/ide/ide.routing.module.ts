@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { IdeComponent } from './ide.component';
 import { TextEditorComponent } from './text-editor/text-editor.component';
+import { SymbolTableComponent } from './symbol-table/symbol-table.component';
+import { MemoryTableComponent } from './memory-table/memory-table.component';
 
 
 
@@ -20,6 +22,6 @@ export const routes: Routes = [
 export class IdeRoutingModule { }
 
 export const routedComponents = [
-  IdeComponent, TextEditorComponent
+  IdeComponent, TextEditorComponent, SymbolTableComponent, MemoryTableComponent
 ];
 
