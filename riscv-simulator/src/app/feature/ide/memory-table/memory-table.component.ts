@@ -2,6 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
+import { Word } from '../../../models/memory-word'
+
 
 @Component({
   selector: 'app-memory-table',
@@ -9,7 +11,32 @@ import { IdeService } from '../ide.service';
   styleUrls: ['./memory-table.component.css']
 })
 export class MemoryTableComponent implements OnInit {
-  constructor(private ideService: IdeService) { }
+  memoryWords: Word[];
 
-  ngOnInit(){}
+  constructor(private ideService: IdeService) {
+    // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
+    this.memoryWords = [
+      {
+        address: "0x1111",
+        value: "0x00000000",
+        color: 'lightblue'
+      }
+    ];
+
+  }
+
+  ngOnInit() { }
+  
+  ngAfterViewInit() {
+    const that = this;
+    this.ideService.state$
+      .pipe(
+        map(state => state.memoryWords),
+        filter(data => data != null),
+        distinctUntilChanged()
+      )
+      .subscribe(newWords => {
+        that.memoryWords = newWords;
+      });
+  }
 }

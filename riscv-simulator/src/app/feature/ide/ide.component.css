@@ -1,0 +1,4 @@
+.container:not(#card-container)
+{
+  background-color: #ebeff2
+}

@@ -8,6 +8,7 @@ import { IdeService } from '../ide.service';
   templateUrl: './text-editor.component.html',
   styleUrls: ['./text-editor.component.css']
 })
+  
 export class TextEditorComponent implements OnInit {
   constructor(private ideService: IdeService) { }
 

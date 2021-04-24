@@ -1,4 +1,12 @@
-<div>
-
-  <router-outlet></router-outlet>
+<div style="height: 100%; width: auto;">
+    <div style="display: block; background-color: #0763a8; padding: 5px">
+        <div style="margin-left: 2px; margin-right: 2px; display: inline;">
+            <button (click)="menuClicked($event, 'assemble')" > Assemble</button>
+            <mat-menu #aboveMenu="matMenu" yPosition="above">
+            <!-- <button mat-menu-item>Item 1</button>
+            <button mat-menu-item>Item 2</button> -->
+            </mat-menu>
+        </div>
+    </div>
+    <router-outlet></router-outlet>  
 </div>

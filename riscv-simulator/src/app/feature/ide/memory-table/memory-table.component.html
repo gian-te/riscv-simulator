@@ -1,6 +1,12 @@
-<span> hello from the memory table </span>
-<table>
-    <tr>
-        <!-- for loop here to loop over ideService.addresses or something-->
-    </tr>
+<span> Memory Grid </span>
+<table border="1px solid">
+  <tr *ngFor="let word of memoryWords">
+    <td>
+      <span>{{word.address }}</span>
+    </td>
+    <td>
+      <span>{{word.value }}</span>
+
+    </td>
+  </tr>
 </table>

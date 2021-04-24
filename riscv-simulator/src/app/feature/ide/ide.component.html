@@ -1,18 +1,14 @@
-<div>
+<!-- <div>
     <span style="vertical-align: top;"> top bar here </span>
-</div>
-
-<div style="height:  100%; display: block;">
-    <!-- pre pano natin sstylan to HAHAHA -->
+</div> -->
+<div class="container" style="height:  100%; display: block;">
     <div>
-        <app-text-editor></app-text-editor>
+        <div style="display: inline-block; width: 80.5%; min-width: 20.5%; float: left;">
+            <app-text-editor></app-text-editor>
+        </div>
+        <div  style="display: inline-block; width: 15%; min-width: 15%; float: right;">
+            <app-symbol-table></app-symbol-table>
+            <app-memory-table></app-memory-table>
+        </div>
     </div>
-    
-    <div>
-        <app-symbol-table></app-symbol-table>
-    </div>
-    <div>
-        <app-memory-table></app-memory-table>
-    </div>
-    
 </div>
