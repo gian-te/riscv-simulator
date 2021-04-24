@@ -11,17 +11,27 @@ import { Word } from '../../../models/memory-word'
   styleUrls: ['./memory-table.component.css']
 })
 export class MemoryTableComponent implements OnInit {
-  memoryWords: Word[];
+  instructions: Word[];
+  data: Word[]
 
   constructor(private ideService: IdeService) {
     // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
-    this.memoryWords = [
+    this.instructions = [
       {
-        address: "0x1111",
+        address: "0x1000",
         value: "0x00000000",
-        color: 'lightblue'
+        //color: 'lightblue'
       }
     ];
+
+    this.data = [
+      {
+        address: "0x0000",
+        value: "0x00000000",
+        //color: 'lightblue'
+      }
+    ];
+
 
   }
 
@@ -37,12 +47,22 @@ export class MemoryTableComponent implements OnInit {
     const that = this;
     this.ideService.state$
       .pipe(
-        map(state => state.memoryWords),
+        map(state => state.instructions),
         filter(data => data != null),
         distinctUntilChanged()
       )
-      .subscribe(newWords => {
-        that.memoryWords = newWords;
+      .subscribe(newInstructions => {
+        that.instructions = newInstructions;
+      });
+    
+      this.ideService.state$
+      .pipe(
+        map(state => state.data),
+        filter(data => data != null),
+        distinctUntilChanged()
+      )
+      .subscribe(newData => {
+        that.data = newData;
       });
   }
 }

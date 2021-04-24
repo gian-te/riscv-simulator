@@ -8,14 +8,14 @@
         <td> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of memoryWords">
+      <tr *ngFor="let word of data">
         <td>
           <span>{{word.address }}</span>
         </td>
         <td>
           <span>{{word.value }}</span>
     
-        </td>
+        </td> 
       </tr>
     </table>
   </mat-card>
@@ -29,7 +29,7 @@
         <td> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of memoryWords">
+      <tr *ngFor="let word of instructions">
         <td>
           <span>{{word.address }}</span>
         </td>

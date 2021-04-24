@@ -8,7 +8,8 @@ export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
   symbols: any; // most likely a dictionary
-  memoryWords: Word[]; // most likely an array of opcodes 
+  instructions: Word[]; // most likely an array of opcodes 
+  data: Word[]
   isAssembling: boolean = false;
 }
 
@@ -20,11 +21,18 @@ export class IdeService extends Store<IdeState> {
       super(new IdeState());
   }
 
-  public updateMemoryWords(data): void {
+  public updateInstructions(inst): void {
     this.setState({
           ...this.state,
-          memoryWords: data,
+          instructions: inst,
         });
+  }
+  
+  public updateData(data): void {
+    this.setState({
+      ...this.state,
+      data: data,
+    });
   }
 
   public assembling(data: boolean)
