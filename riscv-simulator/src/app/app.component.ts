@@ -15,7 +15,8 @@ export class AppComponent {
     console.log(menu);
     
     if (menu == 'assemble') {
-      this.ideService.assemble();
+      console.log('calling ideService');
+      this.ideService.assembling(true);
     }
   }
 }

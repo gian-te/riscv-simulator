@@ -25,6 +25,12 @@ export class MemoryTableComponent implements OnInit {
 
   }
 
+  menuClicked(e, menu: string) {
+    console.log(e);
+    console.log(menu);
+    this.ideService.assembling(true);
+  }
+
   ngOnInit() { }
   
   ngAfterViewInit() {

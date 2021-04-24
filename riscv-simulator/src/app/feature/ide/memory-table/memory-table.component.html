@@ -1,12 +1,44 @@
-<span> Memory Grid </span>
-<table border="1px solid">
-  <tr *ngFor="let word of memoryWords">
-    <td>
-      <span>{{word.address }}</span>
-    </td>
-    <td>
-      <span>{{word.value }}</span>
-
-    </td>
-  </tr>
-</table>
+<div style="height: 100%; margin: 10px;">
+  <mat-card class="card card-top">
+    <mat-card-header>Memory (Data)</mat-card-header>
+    <table border="1px solid">
+      <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
+      <tr>
+        <td> <span> Address</span></td>
+        <td> <span> Value</span></td>
+    
+      </tr>
+      <tr *ngFor="let word of memoryWords">
+        <td>
+          <span>{{word.address }}</span>
+        </td>
+        <td>
+          <span>{{word.value }}</span>
+    
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+  
+  <br>
+  <mat-card class="card card-top">
+    <mat-card-header>Memory (Instructions)</mat-card-header>
+    <table border="1px solid">
+      <tr>
+        <td> <span> Address</span></td>
+        <td> <span> Value</span></td>
+    
+      </tr>
+      <tr *ngFor="let word of memoryWords">
+        <td>
+          <span>{{word.address }}</span>
+        </td>
+        <td>
+          <span>{{word.value }}</span>
+    
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+  
+</div>

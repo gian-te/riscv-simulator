@@ -1,6 +1,25 @@
-<span> Symbol Table </span>
-<table>
+<div style="height: 100%; margin: 10px;">
+<mat-card class="card card-top">
+  <mat-card-header>Symbol Table</mat-card-header>
+  <table border="1px solid">
+    <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
     <tr>
-        <!-- for loop here to loop over ideService.symbols or something-->
+      <td> <span> Name</span></td>
+      <td> <span> Type</span></td>
+      <td> <span> Address</span></td>
+  
     </tr>
-</table>
+    <tr *ngFor="let variable of variables">
+      <td>
+        <span>{{variable.name }}</span>
+      </td>
+      <td>
+        <span>{{variable.type }}</span>
+      </td>
+      <td>
+          <span>{{variable.address }}</span>
+      </td>
+    </tr>
+  </table>
+</mat-card>
+</div>

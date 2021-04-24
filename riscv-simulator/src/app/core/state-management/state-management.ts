@@ -1,5 +1,6 @@
 import {Observable, BehaviorSubject} from 'rxjs';
 
+// https://dev.to/angular/simple-yet-powerful-state-management-in-angular-with-rxjs-4f8g
 export class Store<T> {
     state$: Observable<T>;
     private _state$: BehaviorSubject<T>;
