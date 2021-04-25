@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
+import { FormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card'
@@ -29,7 +30,8 @@ export const routes: Routes = [
     CommonModule,
     IdeRoutingModule,
     // add as needed depending on what we want to plug in to our UI
-    MatMenuModule, MatGridListModule, MatCardModule,
+    FormsModule, // angular forms modules
+    MatMenuModule, MatGridListModule, MatCardModule, // angular material modules
   ],
   exports:
     [
