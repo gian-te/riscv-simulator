@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card'
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { MatButtonModule } from '@angular/material/button';
 
 import { IdeComponent } from './ide.component';
 import { IdeRoutingModule, routedComponents } from './ide.routing.module';
@@ -31,7 +33,7 @@ export const routes: Routes = [
     IdeRoutingModule,
     // add as needed depending on what we want to plug in to our UI
     FormsModule, // angular forms modules
-    MatMenuModule, MatGridListModule, MatCardModule, // angular material modules
+    MatMenuModule, MatGridListModule, MatCardModule, MatToolbarModule, MatButtonModule// angular material modules
   ],
   exports:
     [
