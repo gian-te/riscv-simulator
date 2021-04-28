@@ -15,6 +15,12 @@ export class IdeState {
 
 @Injectable()
 export class IdeService extends Store<IdeState> {
+  listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
+  listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
+  listOfSupportedComputationInstructions: string[] = ['ADD', 'SLT'];
+  listOfSupportedComputationImmediateInstructions: string[] = [ 'ADDI',  'SLTI'];
+  listOfSupportedControlTransferInstructions: string[] = ['BEQ', 'BNE', 'BLT', 'BGE'];
+  listOfSupportedDatatypes: string[] = ['.BYTE' , '.HALF', '.WORD'];
 
 
   constructor() {
@@ -128,25 +134,96 @@ export class IdeService extends Store<IdeState> {
       code: newCode,
     });
 
-    // so by this point we already have the tokens per section in the text editor.
-    // we can parse these tokens sequentially, in order to figure out the lines of code.
-    let lines = this.parseTokensToLines(codeBySection);
-    console.log(lines);
+    let variableLines = this.parseDataSection(codeBySection);
+    console.log(variableLines); // pwede na ipasa to dun sa service
+
+    let codeLines = this.parseTextSection(codeBySection);
+    console.log(codeLines); // gagawin pa tong opcode
   }
 
-  public parseTokensToLines(codeBySection: any) : any
+  public parseDataSection(codeBySection: any): any{
+    let variableLines: any[] = [];
+    let listOfSupportedDatatypes: string[] = this.listOfSupportedDatatypes
+
+    let variables = Object.keys(codeBySection.data);
+
+     /*
+     * Grammar/Productions:
+     * E => Line
+     * Line => [type] [value]                    // production rule 1
+     */
+
+    let pattern1 = false;
+    let error = false;
+
+    for (let i = 0; i < variables.length; i++) {
+      let variableTokens = codeBySection.data[variables[i]];
+      let lineTokens: any = [];
+      let lineTokenTypes: any = [];
+
+      for (let j = 0; j < variableTokens.length; j++)
+      {
+        // check if the next few tokens are either production 1, production 2, or production 3
+        // ideally this is a finite state machine or a pushdown automata but yeah we'll make it work like this for now.
+        let token = variableTokens[j].toUpperCase();
+        let tokenType: string = '';
+        console.log(token);
+
+        if (listOfSupportedDatatypes.includes(token)) {
+          tokenType = 'type';
+        } else tokenType = 'value'; // naive check lol
+  
+        lineTokens.push(token.toLowerCase());
+        lineTokenTypes.push(tokenType);
+        
+        // pattern 1 checking: [instruction] [register],[register]   
+        if (this.patternMatch(lineTokenTypes, ['type', 'value']))
+        {
+          pattern1 = true;
+        } else pattern1 = false;
+
+
+        if (pattern1) {
+          variableLines.push({
+            'name': variables[i],
+            'type': lineTokens[0],
+            'value': lineTokens[1]
+          }); 
+          lineTokenTypes = [];
+          lineTokens = [];
+          pattern1 = false;
+        }
+        else if ( lineTokenTypes.length > 1)
+        {
+          // error na
+          alert("Compilation error in the .data section. The error was found around line " + (variableLines.length + 1) + " of this section, near " + "'" + lineTokens[j] + "'.");
+          error = true;
+        }
+
+      }
+
+      if (error) break;
+    }
+
+    return variableLines;
+  }
+
+  public parseTextSection(codeBySection: any) : any
   {
-    let lines: any[] = [];
+    let codeLines: any[] = [];
     // ito lang yung nasa specs
-    let listOfSupportedInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW', 'ADD', 'ADDI', 'SLT', 'SLTI', 'BEQ', 'BNE', 'BLT', 'BGE'];
+    let listOfSupportedComputationInstructions: string[] = this.listOfSupportedComputationInstructions;
+    let listOfSupportedComputationImmediateInstructions: string[] = this.listOfSupportedComputationImmediateInstructions;
+    let listOfSupportedLoadStoreInstructions: string[] = this.listOfSupportedLoadStoreInstructions;
+    let listOfSupportedControlTransferInstructions: string[] = this.listOfSupportedControlTransferInstructions;
     // lol dagdagan nalang para dun sa a1 a2
-    let listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
+    let listOfSupportedRegisters: string[] = this.listOfSupportedRegisters
 
     /*
-     * Grammars:
+     * Grammar/Productions:
      * E => Line
-     * Line => [instruction] [register],[register]                     // production rule 1
-     * Line => [instruction] [register],[register],[register]          // production rule 2
+     * Line => [instruction] [register],[register],[register]          // production rule 1
+     * Line => [instruction] [register],[register]                     // production rule 2
      * Line => [instruction] [register],[address(address)]             // production rule 3
      * Line => [instruction] [register],[variable]                     // production rule 4
      * Line => [macro]                                                 // production rule 5
@@ -166,7 +243,10 @@ export class IdeService extends Store<IdeState> {
       let tokenType: string = '';
       console.log(token);
       
-      if (listOfSupportedInstructions.includes(token)) tokenType = 'instruction';
+      if (listOfSupportedComputationInstructions.includes(token)) tokenType = 'computation_instruction';
+      if (listOfSupportedComputationImmediateInstructions.includes(token)) tokenType = 'computation_immediate_instruction';
+      if (listOfSupportedLoadStoreInstructions.includes(token)) tokenType = 'loadstore_instruction';
+      if (listOfSupportedControlTransferInstructions.includes(token)) tokenType = 'conditional_branch_instruction';
       if (listOfSupportedRegisters.includes(token)) tokenType = 'register';
       if (token.includes('(') && token.includes(')')) tokenType = 'address'; // lol happy path
       if (codeBySection.macro[token] != undefined || codeBySection.macro[token.toLowerCase()] != undefined) tokenType = 'macro';
@@ -176,26 +256,26 @@ export class IdeService extends Store<IdeState> {
       lineTokenTypes.push(tokenType);
 
       
-      // pattern 1 checking: [instruction] [register],[register]   
-      if (this.patternMatch(lineTokenTypes, ['instruction', 'register', 'register']))
+      // pattern 1 checking: [computation_instruction] [register],[register],[register]   
+      if (this.patternMatch(lineTokenTypes, ['computation_instruction', 'register', 'register', 'register']))
       {
         pattern1 = true;
       } else pattern1 = false;
 
-      // pattern 2 checking: [instruction] [register],[register],[register] 
-      if (this.patternMatch(lineTokenTypes, ['instruction', 'register', 'register', 'register']))
+      // pattern 1 checking: [computation_immediate_instruction] [register],[register],[register]   
+      if (this.patternMatch(lineTokenTypes, ['computation_immediate_instruction', 'register', 'register', 'register']))
       {
         pattern2 = true;
       } else pattern2 = false;
   
       // pattern 3 checking: [instruction] [register],[address(address)]  
-      if (this.patternMatch(lineTokenTypes, ['instruction', 'register', 'address']))
+      if (this.patternMatch(lineTokenTypes, ['loadstore_instruction', 'register', 'address']))
       {
         pattern3 = true; 
       }  else pattern3 = false;
    
-      // pattern 4 checking: [macro]  
-      if (this.patternMatch(lineTokenTypes ,['instruction', 'register', 'variable']))
+      // pattern 4 checking: mahirap to. wag muna gawin
+      if (this.patternMatch(lineTokenTypes, ['conditional_branch_instruction', 'register', 'register', 'offset_address']))
       {
         pattern4 = true;
       } else pattern4 = false;
@@ -208,20 +288,20 @@ export class IdeService extends Store<IdeState> {
 
 
       if (pattern1 || pattern2 || pattern3 || pattern4 || pattern5) {
-        lines.push(lineTokens); // itong lines, later on ito yung gagawin nating op-code.
+        codeLines.push(lineTokens); // itong lines, later on ito yung gagawin nating op-code.
         lineTokenTypes = [];
         lineTokens = [];
         pattern1 = false, pattern2 = false, pattern3 = false, pattern4 = false, pattern5 = false;
       }
-      else if (tokenType == '' || ( lineTokenTypes.length > 4))
+      else if (tokenType == '' || ( lineTokenTypes.length > 4) )
       {
         // error na, hanggang 4 tokens lang
-        alert("Compilation error in the .text section. The error was found around line " + (lines.length) + " of this section, near " + "'" + tokens[i] + "'.");
+        alert("Compilation error in the .text section. The error was found around line " + (codeLines.length + 1) + " of this section, near " + "'" + tokens[i] + "'.");
         break;
       }
     }
 
-    return lines
+    return codeLines
   }
 
   private patternMatch(lineTokens: any, pattern: any): boolean{
@@ -229,7 +309,7 @@ export class IdeService extends Store<IdeState> {
       return false;
    };
    for(let i = 0; i < lineTokens.length; i++){
-      if(!pattern.includes(lineTokens[i])){
+      if(pattern[i] != lineTokens[i]){
          return false;
       };
    };
