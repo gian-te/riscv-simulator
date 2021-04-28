@@ -274,13 +274,13 @@ export class IdeService extends Store<IdeState> {
         pattern2Match = true;
       } else pattern2Match = false;
   
-      // pattern 3 checking: [instruction] [register],[address(address)]  
+      // pattern 3 checking: [loadstore_instruction] [register],[address(address)]  
       if (this.patternMatch(lineTokenTypes, pattern3 ))
       {
         pattern3Match = true; 
       }  else pattern3Match = false;
    
-      // pattern 4 checking: mahirap to. wag muna gawin
+      // pattern 4 checking: [conditional_branch_instruction] => mahirap to. wag muna gawin
       if (this.patternMatch(lineTokenTypes, pattern4))
       {
         pattern4Match = true;
