@@ -233,7 +233,7 @@ export class IdeService extends Store<IdeState> {
     let tokens = codeBySection.text.main;
     let lineTokenTypes: any[] = [];
     let lineTokens: any[] = [];
-    let pattern1 = false, pattern2 = false, pattern3 = false, pattern4 = false, pattern5 = false;
+    let pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false;
     
     for (let i = 0; i < tokens.length; i++)
     {
@@ -255,45 +255,55 @@ export class IdeService extends Store<IdeState> {
       lineTokens.push(token);
       lineTokenTypes.push(tokenType);
 
-      
+      let pattern1= ['computation_instruction', 'register', 'register', 'register'];
+      let pattern2= ['computation_immediate_instruction', 'register', 'register', 'register'];
+      let pattern3= ['loadstore_instruction', 'register', 'address'];
+      let pattern4 = ['conditional_branch_instruction', 'register', 'register', 'offset_address'];
+      let pattern5 = ['macro'];
+
+
       // pattern 1 checking: [computation_instruction] [register],[register],[register]   
-      if (this.patternMatch(lineTokenTypes, ['computation_instruction', 'register', 'register', 'register']))
+      if (this.patternMatch(lineTokenTypes, pattern1))
       {
-        pattern1 = true;
-      } else pattern1 = false;
+        pattern1Match = true;
+      } else pattern1Match = false;
 
       // pattern 1 checking: [computation_immediate_instruction] [register],[register],[register]   
-      if (this.patternMatch(lineTokenTypes, ['computation_immediate_instruction', 'register', 'register', 'register']))
+      if (this.patternMatch(lineTokenTypes, pattern2))
       {
-        pattern2 = true;
-      } else pattern2 = false;
+        pattern2Match = true;
+      } else pattern2Match = false;
   
       // pattern 3 checking: [instruction] [register],[address(address)]  
-      if (this.patternMatch(lineTokenTypes, ['loadstore_instruction', 'register', 'address']))
+      if (this.patternMatch(lineTokenTypes, pattern3 ))
       {
-        pattern3 = true; 
-      }  else pattern3 = false;
+        pattern3Match = true; 
+      }  else pattern3Match = false;
    
       // pattern 4 checking: mahirap to. wag muna gawin
-      if (this.patternMatch(lineTokenTypes, ['conditional_branch_instruction', 'register', 'register', 'offset_address']))
+      if (this.patternMatch(lineTokenTypes, pattern4))
       {
-        pattern4 = true;
-      } else pattern4 = false;
+        pattern4Match = true;
+      } else pattern4Match = false;
 
       // pattern 5 checking: [macro]  
-      if (this.patternMatch(lineTokenTypes, ['macro']))
+      if (this.patternMatch(lineTokenTypes, pattern5))
       {
-        pattern5 = true;
-      } else pattern5 = false;
+        pattern5Match = true;
+      } else pattern5Match = false;
 
-
-      if (pattern1 || pattern2 || pattern3 || pattern4 || pattern5) {
+      // if exact match, add line
+      if (pattern1Match || pattern2Match || pattern3Match || pattern4Match || pattern5Match) {
         codeLines.push(lineTokens); // itong lines, later on ito yung gagawin nating op-code.
         lineTokenTypes = [];
         lineTokens = [];
-        pattern1 = false, pattern2 = false, pattern3 = false, pattern4 = false, pattern5 = false;
+        pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false;
       }
-      else if (tokenType == '' || ( lineTokenTypes.length > 4) )
+      else if ( this.patternSimilar(lineTokenTypes, pattern1) || this.patternSimilar(lineTokenTypes, pattern2) || this.patternSimilar(lineTokenTypes, pattern3) || this.patternSimilar(lineTokenTypes, pattern4) || this.patternSimilar(lineTokenTypes, pattern5)    )  // if approaching exact match, continue
+      {
+        console.log('similar match, assembling line...');
+      }
+      else 
       {
         // error na, hanggang 4 tokens lang
         alert("Compilation error in the .text section. The error was found around line " + (codeLines.length + 1) + " of this section, near " + "'" + tokens[i] + "'.");
@@ -304,6 +314,7 @@ export class IdeService extends Store<IdeState> {
     return codeLines
   }
 
+  // check for an exact match
   private patternMatch(lineTokens: any, pattern: any): boolean{
     if(lineTokens.length !== pattern.length){
       return false;
@@ -314,5 +325,15 @@ export class IdeService extends Store<IdeState> {
       };
    };
    return true;
+  }
+
+  // check for a similar match while assembling the line
+  private patternSimilar(lineTokens: any, pattern: any): boolean{
+    for(let i = 0; i < lineTokens.length; i++){
+      if(pattern[i] != lineTokens[i]){
+         return false;
+      };
+    };
+    return true;
   }
 }
