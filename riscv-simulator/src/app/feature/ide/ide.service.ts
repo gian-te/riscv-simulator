@@ -216,7 +216,7 @@ export class IdeService extends Store<IdeState> {
       else if (tokenType == '' || ( lineTokenTypes.length > 4))
       {
         // error na, hanggang 4 tokens lang
-        alert("Compilation error in .text section. The error was found around line " + (lines.length) + " in this section, near " + "'" + tokens[i] + "'.");
+        alert("Compilation error in the .text section. The error was found around line " + (lines.length) + " of this section, near " + "'" + tokens[i] + "'.");
         break;
       }
     }
