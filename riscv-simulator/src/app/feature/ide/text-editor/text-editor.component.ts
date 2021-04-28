@@ -12,7 +12,7 @@ import { IdeService } from '../ide.service';
 export class TextEditorComponent implements OnInit {
   constructor(private ideService: IdeService) { }
 
-  code: any = ''; // bind this to the ui
+  code: any = '.globl main\n.data\nvar1: .byte 0x05\nvar2: .byte 0x06\n\n.macro done\n\tli a7, 10\n\tecall\n.end_macro\n\n.text\nmain:\n\tlw x5, var1\n\tlw x6, var2\n\tlb x10, 0(x5)\n\tlb x11, 0(x6)\n\tadd x12, x10, x11\n\tdone'; // bind this to the ui
 
   ngOnInit() {
 
