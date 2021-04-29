@@ -12,10 +12,12 @@ export class IdeState {
   data: any;
   isAssembling: boolean = false;
   memory: any;
+  registers: any;
 }
 
 @Injectable()
 export class IdeService extends Store<IdeState> {
+
   listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
   listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
   listOfSupportedComputationInstructions: string[] = ['ADD', 'SLT'];
@@ -46,6 +48,13 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       memory: memory,
+    });
+  }
+
+  updateRegisters(listOfSupportedRegisters: any) {
+    this.setState({
+      ...this.state,
+      registers: listOfSupportedRegisters,
     });
   }
 
@@ -232,7 +241,8 @@ export class IdeService extends Store<IdeState> {
     let listOfSupportedLoadStoreInstructions: string[] = this.listOfSupportedLoadStoreInstructions;
     let listOfSupportedControlTransferInstructions: string[] = this.listOfSupportedControlTransferInstructions;
     // lol dagdagan nalang para dun sa a1 a2
-    let listOfSupportedRegisters: string[] = this.listOfSupportedRegisters
+    let listOfSupportedRegisters: string[] = Object.keys(this.state.registers);
+    listOfSupportedRegisters = listOfSupportedRegisters.map(function(x){ return x.toUpperCase(); })
 
     
     let pattern1= ['computation_instruction', 'register', 'register', 'register'];

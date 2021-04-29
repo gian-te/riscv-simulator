@@ -17,10 +17,11 @@ export class MemoryTableComponent implements OnInit {
   counter: number = 0;
 
   constructor(private ideService: IdeService) {
+    // pano natin pagkakasyahin 1024 slots sa UI? lol
     // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
     this.instructions = [
       {
-        address: "0x1000",
+        address: "1000",
         value: "0x00000000",
         //color: 'lightblue'
       }
@@ -28,7 +29,7 @@ export class MemoryTableComponent implements OnInit {
 
     this.data = [
       {
-        address: "0x0000",
+        address: "0000",
         value: "0x00000000",
         //color: 'lightblue'
       }

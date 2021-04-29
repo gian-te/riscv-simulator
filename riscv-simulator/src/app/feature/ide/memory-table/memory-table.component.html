@@ -10,7 +10,7 @@
       </tr>
       <tr *ngFor="let address of memory | keyvalue">
         <td>
-          <span>{{address.key }}</span>
+          <span><b>{{address.key }}</b></span>
         </td>
         <td>
           <span>{{address.value.value }}</span>
@@ -31,7 +31,7 @@
       </tr>
       <tr *ngFor="let word of instructions">
         <td>
-          <span>{{word.address }}</span>
+          <span><b>{{word.address }}</b></span>
         </td>
         <td>
           <span>{{word.value }}</span>
