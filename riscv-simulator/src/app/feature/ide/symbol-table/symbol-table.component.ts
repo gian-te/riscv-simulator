@@ -10,16 +10,29 @@ import { Symbol } from '../../../models/symbol'
   styleUrls: ['./symbol-table.component.css']
 })
 export class SymbolTableComponent implements OnInit {
-  variables: Symbol[];
+  variables: any;
 
   constructor(private ideService: IdeService) {
     this.variables = [
       {
-        address: "0x1111",
-        name: "var1",
-        type: ".float"
+        address: "0",
+        name: "sample_var",
+        type: ".word"
       }
     ];
    }
-  ngOnInit(){}
+  ngOnInit() { }
+  
+  ngAfterViewInit() {
+    const that = this;
+    this.ideService.state$
+      .pipe(
+        map(state => state.memory),
+        filter(data => data != null),
+        //distinctUntilChanged()
+      )
+      .subscribe(variables => {
+        that.variables = variables;
+      });
+  }
 }

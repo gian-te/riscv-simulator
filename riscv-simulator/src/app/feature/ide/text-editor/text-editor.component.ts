@@ -35,7 +35,6 @@ export class TextEditorComponent implements OnInit {
           this.ideService.checkForErrors();
           this.ideService.storeOpcodesToMemory();
           this.ideService.updateInstructions(null);
-          this.ideService.updateData(null);
           this.ideService.assembling(false);
         }
       });

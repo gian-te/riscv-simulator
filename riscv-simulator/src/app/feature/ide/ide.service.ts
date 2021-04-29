@@ -9,8 +9,9 @@ export class IdeState {
   code: any = '';
   symbols: any; // most likely a dictionary
   instructions: Word[]; // most likely an array of opcodes 
-  data: Word[]
+  data: any;
   isAssembling: boolean = false;
+  memory: any;
 }
 
 @Injectable()
@@ -38,6 +39,13 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       data: data,
+    });
+  }
+
+  public updateMemoryDataSegment(memory): void{
+    this.setState({
+      ...this.state,
+      memory: memory,
     });
   }
 
@@ -135,8 +143,9 @@ export class IdeService extends Store<IdeState> {
     });
 
     let variableLines = this.parseDataSection(codeBySection);
-    console.log(variableLines); // pwede na ipasa to dun sa service
-
+    console.log(variableLines); // pwede na ipasa to dun sa state para ma render sa ibang table
+    this.updateData(variableLines);
+    
     let codeLines = this.parseTextSection(codeBySection);
     console.log(codeLines); // gagawin pa tong opcode
   }
@@ -152,8 +161,9 @@ export class IdeService extends Store<IdeState> {
      * E => Line
      * Line => [type] [value]                    // production rule 1
      */
+    let pattern1= ['type', 'value'];
 
-    let pattern1 = false;
+    let pattern1Match = false;
     let error = false;
 
     for (let i = 0; i < variables.length; i++) {
@@ -179,11 +189,11 @@ export class IdeService extends Store<IdeState> {
         // pattern 1 checking: [instruction] [register],[register]   
         if (this.patternMatch(lineTokenTypes, ['type', 'value']))
         {
-          pattern1 = true;
-        } else pattern1 = false;
+          pattern1Match = true;
+        } else pattern1Match = false;
 
 
-        if (pattern1) {
+        if (pattern1Match) {
           variableLines.push({
             'name': variables[i],
             'type': lineTokens[0],
@@ -191,18 +201,23 @@ export class IdeService extends Store<IdeState> {
           }); 
           lineTokenTypes = [];
           lineTokens = [];
-          pattern1 = false;
+          pattern1Match = false;
         }
-        else if ( lineTokenTypes.length > 1)
+        else if ( this.patternSimilar(lineTokenTypes, pattern1))  // if approaching exact match, continue
+        {
+          console.log('similar match, assembling .data line...');
+        }
+        else 
         {
           // error na
           alert("Compilation error in the .data section. The error was found around line " + (variableLines.length + 1) + " of this section, near " + "'" + lineTokens[j] + "'.");
           error = true;
+          break; // break inner
         }
 
       }
 
-      if (error) break;
+      if (error) break; //break outer
     }
 
     return variableLines;
@@ -218,6 +233,13 @@ export class IdeService extends Store<IdeState> {
     let listOfSupportedControlTransferInstructions: string[] = this.listOfSupportedControlTransferInstructions;
     // lol dagdagan nalang para dun sa a1 a2
     let listOfSupportedRegisters: string[] = this.listOfSupportedRegisters
+
+    
+    let pattern1= ['computation_instruction', 'register', 'register', 'register'];
+    let pattern2= ['computation_immediate_instruction', 'register', 'register', 'register'];
+    let pattern3= ['loadstore_instruction', 'register', 'address'];
+    let pattern4 = ['conditional_branch_instruction', 'register', 'register', 'offset_address'];
+    let pattern5 = ['macro'];
 
     /*
      * Grammar/Productions:
@@ -254,12 +276,6 @@ export class IdeService extends Store<IdeState> {
 
       lineTokens.push(token);
       lineTokenTypes.push(tokenType);
-
-      let pattern1= ['computation_instruction', 'register', 'register', 'register'];
-      let pattern2= ['computation_immediate_instruction', 'register', 'register', 'register'];
-      let pattern3= ['loadstore_instruction', 'register', 'address'];
-      let pattern4 = ['conditional_branch_instruction', 'register', 'register', 'offset_address'];
-      let pattern5 = ['macro'];
 
 
       // pattern 1 checking: [computation_instruction] [register],[register],[register]   
@@ -301,7 +317,7 @@ export class IdeService extends Store<IdeState> {
       }
       else if ( this.patternSimilar(lineTokenTypes, pattern1) || this.patternSimilar(lineTokenTypes, pattern2) || this.patternSimilar(lineTokenTypes, pattern3) || this.patternSimilar(lineTokenTypes, pattern4) || this.patternSimilar(lineTokenTypes, pattern5)    )  // if approaching exact match, continue
       {
-        console.log('similar match, assembling line...');
+        console.log('similar match, assembling .text line...');
       }
       else 
       {
@@ -314,7 +330,7 @@ export class IdeService extends Store<IdeState> {
     return codeLines
   }
 
-  // check for an exact match
+  // check for an exact pattern match
   private patternMatch(lineTokens: any, pattern: any): boolean{
     if(lineTokens.length !== pattern.length){
       return false;
@@ -327,7 +343,7 @@ export class IdeService extends Store<IdeState> {
    return true;
   }
 
-  // check for a similar match while assembling the line
+  // check for a similar pattern match while assembling the line
   private patternSimilar(lineTokens: any, pattern: any): boolean{
     for(let i = 0; i < lineTokens.length; i++){
       if(pattern[i] != lineTokens[i]){

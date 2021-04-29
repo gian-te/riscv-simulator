@@ -4,16 +4,16 @@
     <table border="1px solid">
       <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>
-        <td> <span> Address</span></td>
+        <td> <span> Address (Hex)</span></td>
         <td> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of data">
+      <tr *ngFor="let address of memory | keyvalue">
         <td>
-          <span>{{word.address }}</span>
+          <span>{{address.key }}</span>
         </td>
         <td>
-          <span>{{word.value }}</span>
+          <span>{{address.value.value }}</span>
     
         </td> 
       </tr>
@@ -25,8 +25,8 @@
     <mat-card-header>Memory (Instructions)</mat-card-header>
     <table border="1px solid">
       <tr>
-        <td> <span> Address</span></td>
-        <td> <span> Value</span></td>
+        <td> <span> Address (Hex)</span></td>
+        <td> <span> Value (32-bit Opcode)</span></td>
     
       </tr>
       <tr *ngFor="let word of instructions">
