@@ -79,7 +79,11 @@ export class MemoryTableComponent implements OnInit {
       this.memory[this.counter.toString()] = this.data[i];
       this.counter += 4;
     }
+
+      // send an update that Symbol Table will catch
       this.ideService.updateMemoryDataSegment(this.memory);
       console.log(Object.keys(this.memory));
   }
+  // hack
+  sorting() { }
 }

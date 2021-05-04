@@ -1,6 +1,6 @@
 <mat-card class="card">
   <!-- <mat-card class="card card-top"> -->
-    <p>Memory (Data)</p>
+    <p><b>Memory (Data)</b></p>
     <table border="1px solid">
       <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>
@@ -8,7 +8,7 @@
         <td> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let address of memory | keyvalue">
+      <tr *ngFor="let address of memory | keyvalue: sorting">
         <td>
           <span><b>{{address.key }}</b></span>
         </td>
@@ -22,7 +22,7 @@
 </mat-card>
 <mat-card class="card">
   <!-- <mat-card class="card card-top"> -->
-    <p>Memory (Instructions)</p>
+    <p><b>Memory (Instructions)</b></p>
     <table border="1px solid">
       <tr>
         <td> <span> Address (Hex)</span></td>

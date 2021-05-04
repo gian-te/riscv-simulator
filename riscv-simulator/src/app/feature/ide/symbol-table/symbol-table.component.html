@@ -1,6 +1,6 @@
 <!-- <mat-card class="card card-top"> -->
 <mat-card class="card">
-  <p>Symbol Table</p>
+  <p><b>Symbol Table</b></p>
   <table border="1px solid">
     <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
     <tr>
@@ -9,7 +9,7 @@
       <td> <span> Address (Hex)</span></td>
   
     </tr>
-    <tr *ngFor="let variable of variables | keyvalue">
+    <tr *ngFor="let variable of variables | keyvalue: sorting">
       <td>
         <span><b>{{variable.value.name }}</b></span>
       </td>

@@ -153,10 +153,16 @@ export class IdeService extends Store<IdeState> {
 
     let variableLines = this.parseDataSection(codeBySection);
     console.log(variableLines); // pwede na ipasa to dun sa state para ma render sa ibang table
-    this.updateData(variableLines);
+    if (!this.error)
+    {
+      this.updateData(variableLines);
+    }
     
     let codeLines = this.parseTextSection(codeBySection);
     console.log(codeLines); // gagawin pa tong opcode
+
+    // parse code to 32-bit instruction format here
+    
 
     this.error = false;
   }
@@ -175,7 +181,7 @@ export class IdeService extends Store<IdeState> {
     let pattern1= ['type', 'value'];
 
     let pattern1Match = false;
-    let error = false;
+    let syntaxError = false;
 
     for (let i = 0; i < variables.length; i++) {
       let variableTokens = codeBySection.data[variables[i]];
@@ -222,17 +228,17 @@ export class IdeService extends Store<IdeState> {
         {
           // error na
           alert("Compilation error in the .data section. The error was found around line " + (variableLines.length + 1) + " of this section, near " + "'" + lineTokens[j] + "'.");
-          error = true;
+          syntaxError = true;
           break; // break inner
         }
 
       }
 
-      if (error) break; //break outer
+      if (syntaxError) break; //break outer
     }
     let duplicateVariableNames = (new Set(variableLines.map(a => a.name))).size !== variableLines.length;
     if (duplicateVariableNames) { alert('Compilation error in the .data section. There seems to be a duplicate name in the variables.')}
-    this.error = error || duplicateVariableNames;
+    this.error = syntaxError || duplicateVariableNames;
     return variableLines;
   }
 
@@ -290,7 +296,7 @@ export class IdeService extends Store<IdeState> {
       if (codeBySection.macro[token] != undefined || codeBySection.macro[token.toLowerCase()] != undefined) tokenType = 'macro';
       if (codeBySection.data[token] != undefined || codeBySection.data[token.toLowerCase()] != undefined) tokenType = 'variable'; // case-sensitive ba dapat to?
 
-      lineTokens.push(token);
+      lineTokens.push({ 'token': token, 'type': tokenType });
       lineTokenTypes.push(tokenType);
 
 

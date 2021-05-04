@@ -35,4 +35,9 @@ export class SymbolTableComponent implements OnInit {
         that.variables = variables;
       });
   }
+
+  sorting()
+  {
+    
+  }
 }
