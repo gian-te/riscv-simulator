@@ -19,17 +19,88 @@ export class IdeState {
 export class IdeService extends Store<IdeState> {
   error: boolean = false;
   listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
-  listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
-  listOfSupportedComputationInstructions: string[] = ['ADD', 'SLT'];
-  listOfSupportedComputationImmediateInstructions: string[] = [ 'ADDI',  'SLTI'];
-  listOfSupportedControlTransferInstructions: string[] = ['BEQ', 'BNE', 'BLT', 'BGE'];
+  //listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
+  R_type: string[] = ['ADD', 'SLT'];
+  I_type: string[] = ['ADDI', 'SLTI', 'LB', 'LH', 'LW'];
+  S_type: string[] = ['SB', 'SH', 'SW'];
+  SB_type: string[] = ['BEQ', 'BNE', 'BLT', 'BGE'];
   listOfSupportedDatatypes: string[] = ['.BYTE' , '.HALF', '.WORD'];
+  R_opcodes: {
+    'ADD': {
+      'OPCODE': '0110011',
+      'FUNCT3': '000',
+      'FUNCT7': '0000000'
+    },
+    'SLT': {
+      'OPCODE': '0110011',
+      'FUNCT3': '010',
+      'FUNCT7': '0000000'
+    }
+  };
 
+  S_opcodes: {
+    'SB': {
+      'OPCODE': '0100011',
+      'FUNCT3': '000'
+    },
+    'SH': {
+      'OPCODE': '0100011',
+      'FUNCT3': '010',
+      'FUNCT7': '0000000'
+    },
+    'SW': {
+      'OPCODE': '0100011',
+      'FUNCT3': '010'
+    }
+  };
+
+  I_opcodes: {
+    'ADDI': {
+      'OPCODE': '0010011',
+      'FUNCT3': '000'
+    },
+    'SLTI': {
+      'OPCODE': '0010011',
+      'FUNCT3': '010'
+    },
+    'LB': {
+      'OPCODE': '0000011',
+      'FUNCT3': '000'
+    },
+    'LH': {
+      'OPCODE': '0000011',
+      'FUNCT3': '001'
+    },
+    'LW': {
+      'OPCODE': '0000011',
+      'FUNCT3': '010'
+    }
+  };
+
+  SB_opcodes: {
+    'BEQ': {
+      'OPCODE': '1100011',
+      'FUNCT3': '000'
+    },
+    'BNE': {
+      'OPCODE': '1100011',
+      'FUNCT3': '001'
+    },
+    'BLT': {
+      'OPCODE': '1100011',
+      'FUNCT3': '100'
+    },
+    'BGE': {
+      'OPCODE': '1100011',
+      'FUNCT3': '101'
+    }
+  };
 
   constructor() {
     super(new IdeState());
   }
 
+  // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
     this.setState({
       ...this.state,
@@ -37,6 +108,7 @@ export class IdeService extends Store<IdeState> {
     });
   }
 
+  // Sasalohin ni memory table (data)
   public updateData(data): void {
     this.setState({
       ...this.state,
@@ -44,6 +116,7 @@ export class IdeService extends Store<IdeState> {
     });
   }
 
+  // Sasalohin ni symbol table
   public updateMemoryDataSegment(memory): void{
     this.setState({
       ...this.state,
@@ -51,6 +124,7 @@ export class IdeService extends Store<IdeState> {
     });
   }
 
+  // Sasalohin ni register table 
   updateRegisters(listOfSupportedRegisters: any) {
     this.setState({
       ...this.state,
@@ -67,18 +141,6 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.isAssembling);
   }
 
-  public checkForErrors() {
-    // check opcodes maybe?
-  }
-
-  public parseToOpcode() {
-    let code = this.state.code;
-
-  }
-
-  public storeOpcodesToMemory() {
-
-  }
 
   public updateCode(newCode) {
     console.log('setting code to: ' + newCode);
@@ -162,9 +224,74 @@ export class IdeService extends Store<IdeState> {
     console.log(codeLines); // gagawin pa tong opcode
 
     // parse code to 32-bit instruction format here
-    
-
+    var instructionsIn32BitFormat = this.parseLinesTo32Bits(codeLines);
+    if (!this.error)
+    {
+      this.updateInstructions(instructionsIn32BitFormat);
+    }
     this.error = false;
+  }
+
+  public parseLinesTo32Bits(codeLines: any) {
+    //throw new Error('Method not implemented.');
+    var _32bitInstructions = [];
+    for (let i = 0; i < codeLines.length; i++)
+    {
+      let line = codeLines[i];
+      let instructionType = line[0].type;
+      console.log('The instruction is a/an ' + instructionType + ' type.')
+      let _32bitInstruction = '00000000000000000000000000000000'; // default value
+
+      if (instructionType.toUpperCase() == 'R')
+      {
+        /*
+         * 0-6: opcode
+         * 7-11: rd
+         * 12-14: funct3
+         * 15-19: rs1
+         * 20-24: rs2
+         * 25-31: funct7
+         */
+
+      }
+      else if (instructionType.toUpperCase() == 'I')
+      {
+        /*
+         * 0-6: opcode
+         * 7-11: rd
+         * 12-14: funct3
+         * 15-19: rs1
+         * 20-31: imm
+         */
+
+      }
+      else if (instructionType.toUpperCase() == 'S')
+      {
+        /*
+         * 0-6: opcode
+         * 7-11: imm
+         * 12-14: funct3
+         * 15-19: rs1
+         * 20-24: rs2
+         * 25-31: imm
+         */
+
+      }
+      else if (instructionType.toUpperCase() == 'SB')
+      {
+        /*
+         * 0-6: opcode
+         * 7-11: imm
+         * 12-14: funct3
+         * 15-19: rs1
+         * 20-24: rs2
+         * 25-31: imm
+         */
+
+      }
+    }
+
+    return _32bitInstructions;
   }
 
   public parseDataSection(codeBySection: any): any{
@@ -248,20 +375,21 @@ export class IdeService extends Store<IdeState> {
     
     let codeLines: any[] = [];
     // ito lang yung nasa specs
-    let listOfSupportedComputationInstructions: string[] = this.listOfSupportedComputationInstructions;
-    let listOfSupportedComputationImmediateInstructions: string[] = this.listOfSupportedComputationImmediateInstructions;
-    let listOfSupportedLoadStoreInstructions: string[] = this.listOfSupportedLoadStoreInstructions;
-    let listOfSupportedControlTransferInstructions: string[] = this.listOfSupportedControlTransferInstructions;
+    let R_type: string[] = this.R_type;
+    let S_type: string[] = this.S_type;
+    let I_type: string[] = this.I_type;
+    let SB_type: string[] = this.SB_type;
     // lol dagdagan nalang para dun sa a1 a2
     let listOfSupportedRegisters: string[] = Object.keys(this.state.registers);
     listOfSupportedRegisters = listOfSupportedRegisters.map(function(x){ return x.toUpperCase(); })
 
-    
-    let pattern1= ['computation_instruction', 'register', 'register', 'register'];
-    let pattern2= ['computation_immediate_instruction', 'register', 'register', 'register'];
-    let pattern3= ['loadstore_instruction', 'register', 'address'];
-    let pattern4 = ['conditional_branch_instruction', 'register', 'register', 'offset_address'];
+    // need help here
+    let pattern1= ['R', 'register', 'register', 'register'];
+    let pattern2= ['I', 'register', 'register', 'immediate'];
+    let pattern3= ['I', 'register', 'address'];
+    let pattern4 = ['SB', 'register', 'register', 'offset_address'];
     let pattern5 = ['macro'];
+    let pattern6= ['S', 'register', 'address'];
 
     /*
      * Grammar/Productions:
@@ -277,7 +405,7 @@ export class IdeService extends Store<IdeState> {
     let tokens = codeBySection.text.main;
     let lineTokenTypes: any[] = [];
     let lineTokens: any[] = [];
-    let pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false;
+    let pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false, pattern6Match = false;
     
     for (let i = 0; i < tokens.length; i++)
     {
@@ -287,12 +415,17 @@ export class IdeService extends Store<IdeState> {
       let tokenType: string = '';
       console.log(token);
       
-      if (listOfSupportedComputationInstructions.includes(token)) tokenType = 'computation_instruction';
-      if (listOfSupportedComputationImmediateInstructions.includes(token)) tokenType = 'computation_immediate_instruction';
-      if (listOfSupportedLoadStoreInstructions.includes(token)) tokenType = 'loadstore_instruction';
-      if (listOfSupportedControlTransferInstructions.includes(token)) tokenType = 'conditional_branch_instruction';
+      // if (listOfSupportedComputationInstructions.includes(token)) tokenType = 'computation_instruction';
+      // if (listOfSupportedComputationImmediateInstructions.includes(token)) tokenType = 'computation_immediate_instruction';
+      // if (listOfSupportedLoadStoreInstructions.includes(token)) tokenType = 'loadstore_instruction';
+      // if (listOfSupportedControlTransferInstructions.includes(token)) tokenType = 'conditional_branch_instruction';
+      if (R_type.includes(token)) tokenType = 'R';
+      if (I_type.includes(token)) tokenType = 'I';
+      if (SB_type.includes(token)) tokenType = 'SB';
+      if (S_type.includes(token)) tokenType = 'S';
       if (listOfSupportedRegisters.includes(token)) tokenType = 'register';
       if (token.includes('(') && token.includes(')')) tokenType = 'address'; // lol happy path
+      if (token.includes('0x')) tokenType = 'immediate'; // lol happy path
       if (codeBySection.macro[token] != undefined || codeBySection.macro[token.toLowerCase()] != undefined) tokenType = 'macro';
       if (codeBySection.data[token] != undefined || codeBySection.data[token.toLowerCase()] != undefined) tokenType = 'variable'; // case-sensitive ba dapat to?
 
@@ -330,14 +463,21 @@ export class IdeService extends Store<IdeState> {
         pattern5Match = true;
       } else pattern5Match = false;
 
+       // pattern 5 checking: [S type]  
+       if (this.patternMatch(lineTokenTypes, pattern6))
+       {
+         pattern6Match = true;
+      } else pattern6Match = false;
+      
       // if exact match, add line
-      if (pattern1Match || pattern2Match || pattern3Match || pattern4Match || pattern5Match) {
+      if (pattern1Match || pattern2Match || pattern3Match || pattern4Match || pattern5Match || pattern6Match) {
         codeLines.push(lineTokens); // itong lines, later on ito yung gagawin nating op-code.
         lineTokenTypes = [];
         lineTokens = [];
-        pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false;
+        pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false, pattern6Match = false;
       }
-      else if ( this.patternSimilar(lineTokenTypes, pattern1) || this.patternSimilar(lineTokenTypes, pattern2) || this.patternSimilar(lineTokenTypes, pattern3) || this.patternSimilar(lineTokenTypes, pattern4) || this.patternSimilar(lineTokenTypes, pattern5)    )  // if approaching exact match, continue
+      else if (this.patternSimilar(lineTokenTypes, pattern1) || this.patternSimilar(lineTokenTypes, pattern2) || this.patternSimilar(lineTokenTypes, pattern3) || this.patternSimilar(lineTokenTypes, pattern4) || this.patternSimilar(lineTokenTypes, pattern5) || this.patternSimilar(lineTokenTypes, pattern6))
+      // if approaching exact match, continue
       {
         console.log('similar match, assembling .text line...');
       }

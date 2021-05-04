@@ -31,10 +31,6 @@ export class TextEditorComponent implements OnInit {
         {
           console.log('assembling...');
           this.ideService.updateCode(this.code);  // update the string code
-          this.ideService.parseToOpcode();        // update the 32-bit opcodes, store to a list
-          this.ideService.checkForErrors();
-          this.ideService.storeOpcodesToMemory();
-          this.ideService.updateInstructions(null);
           this.ideService.assembling(false);
         }
       });
