@@ -17,7 +17,7 @@ export class IdeState {
 
 @Injectable()
 export class IdeService extends Store<IdeState> {
-
+  error: boolean = false;
   listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
   listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
   listOfSupportedComputationInstructions: string[] = ['ADD', 'SLT'];
@@ -157,6 +157,8 @@ export class IdeService extends Store<IdeState> {
     
     let codeLines = this.parseTextSection(codeBySection);
     console.log(codeLines); // gagawin pa tong opcode
+
+    this.error = false;
   }
 
   public parseDataSection(codeBySection: any): any{
@@ -228,12 +230,14 @@ export class IdeService extends Store<IdeState> {
 
       if (error) break; //break outer
     }
-
+    this.error = error;
     return variableLines;
   }
 
   public parseTextSection(codeBySection: any) : any
   {
+    if (this.error) { return; }
+    
     let codeLines: any[] = [];
     // ito lang yung nasa specs
     let listOfSupportedComputationInstructions: string[] = this.listOfSupportedComputationInstructions;

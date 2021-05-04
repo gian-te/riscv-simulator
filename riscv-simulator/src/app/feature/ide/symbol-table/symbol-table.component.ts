@@ -14,11 +14,11 @@ export class SymbolTableComponent implements OnInit {
 
   constructor(private ideService: IdeService) {
     this.variables = [
-      {
-        address: "0",
-        name: "sample_var",
-        type: ".word"
-      }
+      // {
+      //   address: "0",
+      //   name: "sample_var",
+      //   type: ".word"
+      // }
     ];
    }
   ngOnInit() { }

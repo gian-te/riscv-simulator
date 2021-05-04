@@ -11,13 +11,13 @@
     </tr>
     <tr *ngFor="let variable of variables | keyvalue">
       <td>
-        <span>{{variable.value.name }}</span>
+        <span><b>{{variable.value.name }}</b></span>
       </td>
       <td>
-        <span>{{variable.value.type }}</span>
+        <span><b>{{variable.value.type }}</b></span>
       </td>
       <td>
-          <span>{{variable.key }}</span>
+          <span><b>{{variable.key }}</b></span>
       </td>
     </tr>
   </table>

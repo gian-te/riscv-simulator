@@ -20,19 +20,19 @@ export class MemoryTableComponent implements OnInit {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
     // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
     this.instructions = [
-      {
-        address: "1000",
-        value: "0x00000000",
-        //color: 'lightblue'
-      }
+      // {
+      //   address: "1000",
+      //   value: "0x00000000",
+      //   //color: 'lightblue'
+      // }
     ];
 
     this.data = [
-      {
-        address: "0000",
-        value: "0x00000000",
-        //color: 'lightblue'
-      }
+      // {
+      //   address: "0000",
+      //   value: "0x00000000",
+      //   //color: 'lightblue'
+      // }
     ];
 
 

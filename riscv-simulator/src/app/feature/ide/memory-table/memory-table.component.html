@@ -13,7 +13,7 @@
           <span><b>{{address.key }}</b></span>
         </td>
         <td>
-          <span>{{address.value.value }}</span>
+          <span><b>{{address.value.value }}</b></span>
     
         </td> 
       </tr>
@@ -26,7 +26,7 @@
     <table border="1px solid">
       <tr>
         <td> <span> Address (Hex)</span></td>
-        <td> <span> Value (32-bit Opcode)</span></td>
+        <td> <span> Value (32-bit Instruction Representation)</span></td>
     
       </tr>
       <tr *ngFor="let word of instructions">
@@ -34,7 +34,7 @@
           <span><b>{{word.address }}</b></span>
         </td>
         <td>
-          <span>{{word.value }}</span>
+          <span><b> {{word.value }}</b></span>
     
         </td>
       </tr>
