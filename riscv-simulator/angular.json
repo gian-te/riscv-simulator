@@ -123,5 +123,8 @@
       }
     }
   },
-  "defaultProject": "riscv-simulator"
+  "defaultProject": "riscv-simulator",
+  "cli": {
+    "analytics": "42147d3e-35e6-4aad-b768-1b26f7752e85"
+  }
 }

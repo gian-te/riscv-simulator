@@ -1,4 +1,52 @@
-.container:not(#card-container)
-{
-  background-color: #ebeff2
+.ide-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  padding: 10px;
+  height: 60px;
+  width: 100%;
+  background-color: #0763a8;
+  box-sizing: border-box;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  color: white;
+  width: 50%;
+  margin: auto 0;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 60px);
+}
+
+.editor {
+  display: flex;
+  width: 50%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.tables {
+  display: flex;
+  width: 50%;
+  height: 100%;
+  flex-direction: column;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.card {
+  display: flex;
+  background-color: white;
 }
