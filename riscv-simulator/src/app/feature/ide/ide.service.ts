@@ -374,4 +374,11 @@ export class IdeService extends Store<IdeState> {
     };
     return true;
   }
+
+  
+  public convertStringToHex(str): string {
+    let num = Number(str);
+    let hex = num.toString(16).toUpperCase();
+    return hex;
+  }
 }

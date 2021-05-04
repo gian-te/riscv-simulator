@@ -84,6 +84,8 @@ export class MemoryTableComponent implements OnInit {
       this.ideService.updateMemoryDataSegment(this.memory);
       console.log(Object.keys(this.memory));
   }
+
+
   // hack
   sorting() { }
 }
