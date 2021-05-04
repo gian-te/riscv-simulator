@@ -1,0 +1,15 @@
+<div mat-dialog-content>
+    <p>Configure Environment</p>
+    <mat-form-field>
+        <mat-label>Cache block size (words):</mat-label>
+        <input matInput [(ngModel)]="data.cacheBlockSize">
+      </mat-form-field>
+      <mat-form-field>
+      <mat-label>Number of cache blocks:</mat-label>
+      <input matInput [(ngModel)]="data.numCacheBlocks">
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+    <button mat-button (click)="onNoClick()">Close</button>
+  </div>
