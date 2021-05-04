@@ -230,7 +230,9 @@ export class IdeService extends Store<IdeState> {
 
       if (error) break; //break outer
     }
-    this.error = error;
+    let duplicateVariableNames = (new Set(variableLines.map(a => a.name))).size !== variableLines.length;
+    if (duplicateVariableNames) { alert('Compilation error in the .data section. There seems to be a duplicate name in the variables.')}
+    this.error = error || duplicateVariableNames;
     return variableLines;
   }
 

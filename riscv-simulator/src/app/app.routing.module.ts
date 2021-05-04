@@ -9,7 +9,6 @@ export const routes: Routes = [
   },
   {
     path: 'ide',
-    pathMatch: 'full',
     loadChildren: () => import(`./feature/ide/ide.module`).then(m => m.IdeModule)
   }
 ];
