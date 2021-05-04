@@ -229,6 +229,9 @@ export class IdeService extends Store<IdeState> {
     {
       this.updateInstructions(instructionsIn32BitFormat);
     }
+
+
+    // reset error flag for next Assemble
     this.error = false;
   }
 
@@ -485,6 +488,7 @@ export class IdeService extends Store<IdeState> {
       {
         // error na, hanggang 4 tokens lang
         alert("Compilation error in the .text section. The error was found around line " + (codeLines.length + 1) + " of this section, near " + "'" + tokens[i] + "'.");
+        this.error = true;
         break;
       }
     }
