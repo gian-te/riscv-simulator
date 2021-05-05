@@ -53,6 +53,7 @@ export class MenuActionsComponent implements OnInit {
         {
           this.ideSettings = result;
           // update state here to notify memory table component of changes in cache block size?
+          this.ideService.updateSettings(this.ideSettings);
         }
       });
     }

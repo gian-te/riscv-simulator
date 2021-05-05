@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
 import { Word } from '../../../models/memory-word'
+import { IdeSettings } from 'src/app/models/ide-settings';
 
 
 @Component({
@@ -15,6 +16,11 @@ export class MemoryTableComponent implements OnInit {
   data: Word[]
   memory: any; // dictionary siguro. key value pair
   counter: number = 0;
+  ideSettings: IdeSettings = 
+    {
+      numCacheBlocks: '128',
+      cacheBlockSize: '4'
+    };
 
   constructor(private ideService: IdeService) {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
@@ -67,6 +73,18 @@ export class MemoryTableComponent implements OnInit {
         // pagka salo ng data, kailangan natin sabihin bigyan ng address yung data
         this.populateMemoryDataSegment();
       });
+    
+     // taga salo ng ide settings, pang divide ng tables
+     this.ideService.state$
+     .pipe(
+       map(state => state.ideSettings),
+       filter(data => data != null),
+       distinctUntilChanged()
+     )
+     .subscribe(newData => {
+       that.ideSettings = newData;
+
+     });
   }
   
   populateMemoryDataSegment()

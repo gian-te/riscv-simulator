@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/1b0c3d2f-5246-4e49-bf36-ad2d6b262c31/resourceGroups/azure-riscv-simulator/providers/Microsoft.Web/sites/riscv-simulator",
+    "appService.deploySubpath": "dist\\riscv-simulator"
+}

@@ -1,11 +1,11 @@
 <mat-card class="card">
   <!-- <mat-card class="card card-top"> -->
     <p><b>Memory (Data)</b></p>
-    <table border="1px solid">
+    <table style="border-collapse:collapse;" border="1px solid">
       <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>
-        <td> <span> Address (Hex)</span></td>
-        <td> <span> Value</span></td>
+        <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
+        <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
       <tr *ngFor="let address of memory | keyvalue: sorting">
@@ -23,10 +23,10 @@
 <mat-card class="card">
   <!-- <mat-card class="card card-top"> -->
     <p><b>Memory (Instructions)</b></p>
-    <table border="1px solid">
+    <table style="border-collapse:collapse;" border="1px solid">
       <tr>
-        <td> <span> Address (Hex)</span></td>
-        <td> <span> Value (32-bit Instruction Representation)</span></td>
+        <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
+        <td style="background-color: darkseagreen;"> <span> Value (32-bit Instruction Representation)</span></td>
     
       </tr>
       <tr *ngFor="let word of instructions">

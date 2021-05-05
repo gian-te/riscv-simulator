@@ -1,12 +1,12 @@
 <!-- <mat-card class="card card-top"> -->
 <mat-card class="card">
   <p><b>Symbol Table</b></p>
-  <table border="1px solid">
+  <table style="border-collapse:collapse;"  border="1px solid">
     <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
     <tr>
-      <td> <span> Name</span></td>
-      <td> <span> Type</span></td>
-      <td> <span> Address (Hex)</span></td>
+      <td style="background-color: lightsteelblue;"> <span> Name</span></td>
+      <td style="background-color: lightsteelblue;"> <span> Type</span></td>
+      <td style="background-color: lightsteelblue;"> <span> Address (Hex)</span></td>
   
     </tr>
     <tr *ngFor="let variable of variables | keyvalue: sorting">

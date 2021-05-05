@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { IdeSettings } from 'src/app/models/ide-settings';
 import { Word } from 'src/app/models/memory-word';
 
 import { Store } from '../../core/state-management/state-management';
@@ -13,10 +14,12 @@ export class IdeState {
   isAssembling: boolean = false;
   memory: any;
   registers: any;
+  ideSettings: any;
 }
 
 @Injectable()
 export class IdeService extends Store<IdeState> {
+
   error: boolean = false;
   listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
   //listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
@@ -132,6 +135,7 @@ export class IdeService extends Store<IdeState> {
     });
   }
 
+
   public assembling(data: boolean) {
     console.log('setting isAssembling to ' + data);
     this.setState({
@@ -141,6 +145,13 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.isAssembling);
   }
 
+  // sasalohin ni memory table
+  public updateSettings(ideSettings: IdeSettings) {
+    this.setState({
+      ...this.state,
+      ideSettings: ideSettings,
+    });
+  }
 
   public updateCode(newCode) {
     console.log('setting code to: ' + newCode);
