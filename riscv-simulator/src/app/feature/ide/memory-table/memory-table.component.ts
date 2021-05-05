@@ -94,8 +94,20 @@ export class MemoryTableComponent implements OnInit {
     // pano i popopulate to?
     for (let i = 0; i < this.data.length; i++)
     {
-      this.memory[this.counter.toString()] = this.data[i];
-      this.counter += 4;
+      let item:any = this.data[i];
+      this.memory[this.counter.toString()] = item;
+      if (item.type == '.byte')
+      {
+        this.counter += 1;
+      }
+      if (item.type == '.word')
+      {
+        this.counter += 4;
+      }
+      if (item.type == '.half')
+      {
+        this.counter += 2;
+      }
     }
 
       // send an update that Symbol Table will catch
