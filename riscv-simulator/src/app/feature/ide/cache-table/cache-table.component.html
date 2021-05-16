@@ -4,16 +4,16 @@
     <table style="border-collapse:collapse;" border="1px solid">
       <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>
-        <td style="background-color: #9e9ac8;"> <span> Address (Hex)</span></td>
-        <td style="background-color: #9e9ac8;"> <span> Value</span></td>
+        <td style="background-color: #9e9ac8;"> <span> Cache Block</span></td>
+        <td style="background-color: #9e9ac8;"> <span> Memory Block</span></td>
     
       </tr>
-      <tr *ngFor="let address of memory | keyvalue: sorting">
+      <tr *ngFor="let i of blocks">
         <td>
-          <span><b>{{ ideService.convertStringToHex(address.key).padStart(4,0 ) }}</b></span>
+          <span><b>{{ i }}</b></span>
         </td>
         <td>
-          <span><b>{{address.value.value }}</b></span>
+          <span><b> 0x00000000</b></span>
     
         </td> 
       </tr>

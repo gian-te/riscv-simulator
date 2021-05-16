@@ -141,9 +141,11 @@ export class IdeService extends Store<IdeState> {
     let newInstructions: Word[] = [];
     for (let i = 0; i < inst.length; i++)
     {
-      let j = i + 4096;
+      let j = i + 4096; // 0x1000 daw ung start sabi ni sir eh
       if (j != 4096 ){ j += 3 * i;}
       // try to simulate +4 hex (tama ba to?)
+      // 1 word in the memory is 8 bits/1 byte.
+      // 32 bits = 4 words. kaya +4 hex ng +4 hex kasi sure na 32 bits ung pinapasok dahil 32 bits ung opcode
 
       let word: Word =
       {

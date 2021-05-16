@@ -18,9 +18,10 @@ export class CacheTableComponent implements OnInit {
   counter: number = 0;
   ideSettings: IdeSettings = 
     {
-      numCacheBlocks: '128',
-      cacheBlockSize: '4'
+      numCacheBlocks: '8', // number of blocks
+      cacheBlockSize: '4'    // 4 words per block
     };
+  blocks = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
 
   constructor(private ideService: IdeService) {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
@@ -83,7 +84,7 @@ export class CacheTableComponent implements OnInit {
      )
      .subscribe(newData => {
        that.ideSettings = newData;
-
+       that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
      });
   }
   
