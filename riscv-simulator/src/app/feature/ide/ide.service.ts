@@ -138,13 +138,12 @@ export class IdeService extends Store<IdeState> {
 
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
-    let instMemoryCtr = 8; // 8 decimal == 1000 hex
     let newInstructions: Word[] = [];
     for (let i = 0; i < inst.length; i++)
     {
       let j = i + 4096;
-      if (j != 4096 ){ j += 3;}
-      // try
+      if (j != 4096 ){ j += 3 * i;}
+      // try to simulate +4 hex (tama ba to?)
 
       let word: Word =
       {
