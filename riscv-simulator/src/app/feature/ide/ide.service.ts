@@ -28,7 +28,7 @@ export class IdeService extends Store<IdeState> {
   S_type: string[] = ['SB', 'SH', 'SW'];
   SB_type: string[] = ['BEQ', 'BNE', 'BLT', 'BGE'];
   listOfSupportedDatatypes: string[] = ['.BYTE' , '.HALF', '.WORD'];
-  R_opcodes: {
+  R_opcodes = {
     'ADD': {
       'OPCODE': '0110011',
       'FUNCT3': '000',
@@ -40,8 +40,7 @@ export class IdeService extends Store<IdeState> {
       'FUNCT7': '0000000'
     }
   };
-
-  S_opcodes: {
+  S_opcodes = {
     'SB': {
       'OPCODE': '0100011',
       'FUNCT3': '000'
@@ -56,8 +55,7 @@ export class IdeService extends Store<IdeState> {
       'FUNCT3': '010'
     }
   };
-
-  I_opcodes: {
+  I_opcodes = {
     'ADDI': {
       'OPCODE': '0010011',
       'FUNCT3': '000'
@@ -79,8 +77,7 @@ export class IdeService extends Store<IdeState> {
       'FUNCT3': '010'
     }
   };
-
-  SB_opcodes: {
+  SB_opcodes = {
     'BEQ': {
       'OPCODE': '1100011',
       'FUNCT3': '000'
@@ -98,6 +95,40 @@ export class IdeService extends Store<IdeState> {
       'FUNCT3': '101'
     }
   };
+  Register_opcodes = {
+    'X0': '00000',
+    'X1': '00001',
+    'X2': '00010',
+    'X3': '00011',
+    'X4': '00100',
+    'X5': '00101',
+    'X6': '00110',
+    'X7': '00111',
+    'X8': '01000',
+    'X9': '01001',
+    'X10': '01010',
+    'X11': '01011',
+    'X12': '01100',
+    'X13': '01101',
+    'X14': '01110',
+    'X15': '01111',
+    'X16': '10000',
+    'X17': '10001',
+    'X18': '10010',
+    'X19': '10011',
+    'X20': '10100',
+    'X21': '10101',
+    'X22': '10110',
+    'X23': '10111',
+    'X24': '11000',
+    'X25': '11001',
+    'X26': '11010',
+    'X27': '11011',
+    'X28': '11100',
+    'X29': '11101',
+    'X30': '11110',
+    'X31': '11111',
+  }
 
   constructor() {
     super(new IdeState());
@@ -248,11 +279,13 @@ export class IdeService extends Store<IdeState> {
 
   public parseLinesTo32Bits(codeLines: any) {
     //throw new Error('Method not implemented.');
-    var _32bitInstructions = [];
+    let _32bitInstructions = [];
     for (let i = 0; i < codeLines.length; i++)
     {
       let line = codeLines[i];
+      console.log(line)
       let instructionType = line[0].type;
+      const instruction = line[0].token;
       console.log('The instruction is a/an ' + instructionType + ' type.')
       let _32bitInstruction = '00000000000000000000000000000000'; // default value
 
@@ -266,7 +299,7 @@ export class IdeService extends Store<IdeState> {
          * 20-24: rs2
          * 25-31: funct7
          */
-
+        _32bitInstruction = `${this.R_opcodes[instruction].FUNCT7}${this.Register_opcodes[line[3].token]}${this.Register_opcodes[line[2].token]}${this.R_opcodes[instruction].FUNCT3}${this.Register_opcodes[line[1].token]}${this.R_opcodes[instruction].OPCODE}`
       }
       else if (instructionType.toUpperCase() == 'I')
       {
@@ -277,7 +310,10 @@ export class IdeService extends Store<IdeState> {
          * 15-19: rs1
          * 20-31: imm
          */
-
+        let imm = this.Register_opcodes[line[2].token].includes('0x') ? this.Register_opcodes[line[2].token].slice(2) : this.Register_opcodes[line[2].token];
+        imm = this.hex2bin(imm)
+        
+        _32bitInstruction = `${imm}${this.I_opcodes[instruction].FUNCT3}${this.Register_opcodes[line[1].token]}${this.I_opcodes[instruction].OPCODE}`
       }
       else if (instructionType.toUpperCase() == 'S')
       {
@@ -303,8 +339,10 @@ export class IdeService extends Store<IdeState> {
          */
 
       }
-    }
 
+      _32bitInstructions[i] = _32bitInstruction;  
+    }
+    console.log('_32bitInstructions',_32bitInstructions)
     return _32bitInstructions;
   }
 
@@ -420,7 +458,7 @@ export class IdeService extends Store<IdeState> {
     let lineTokenTypes: any[] = [];
     let lineTokens: any[] = [];
     let pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false, pattern6Match = false;
-    
+
     for (let i = 0; i < tokens.length; i++)
     {
       // check if the next few tokens are either production 1, production 2, or production 3
@@ -536,4 +574,8 @@ export class IdeService extends Store<IdeState> {
     let hex = num.toString(16).toUpperCase();
     return hex;
   }
+
+  public hex2bin(hex){
+    return ("0000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
+}
 }
