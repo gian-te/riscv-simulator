@@ -31,10 +31,10 @@
       </tr>
       <tr *ngFor="let word of instructions">
         <td>
-          <span><b>{{word.address }}</b></span>
+          <span><b> {{ ideService.convertStringToHex(word.address) }}</b></span>
         </td>
         <td>
-          <span><b> {{word.value }}</b></span>
+          <span><b> {{ideService.convertBinaryToHex(word.value).padStart(8, 0) }}</b></span>
     
         </td>
       </tr>

@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
 import { Word } from 'src/app/models/memory-word';
 
@@ -137,9 +138,24 @@ export class IdeService extends Store<IdeState> {
 
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
+    let instMemoryCtr = 8; // 8 decimal == 1000 hex
+    let newInstructions: Word[] = [];
+    for (let i = 0; i < inst.length; i++)
+    {
+      let j = i;
+      if (j != 0 ){ j += 3;}
+      //newInstructions[j] = inst[i];
+
+      let word: Word =
+      {
+        address: j.toString(),
+        value:  inst[i]
+      }
+      newInstructions.push(word);
+    }
     this.setState({
       ...this.state,
-      instructions: inst,
+      instructions: newInstructions,
     });
   }
 
@@ -639,6 +655,13 @@ export class IdeService extends Store<IdeState> {
 
   public convertStringToHex(str): string {
     let num = Number(str);
+    let hex = num.toString(16).toUpperCase();
+    return hex;
+  }
+
+  public convertBinaryToHex(bin): string {
+    let digit = parseInt(bin, 2);
+    let num = Number(digit);
     let hex = num.toString(16).toUpperCase();
     return hex;
   }
