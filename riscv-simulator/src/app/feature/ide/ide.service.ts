@@ -155,7 +155,7 @@ export class IdeService extends Store<IdeState> {
     }
     this.setState({
       ...this.state,
-      instructions: newInstructions,
+      instructions: newInstructions, // itong $state.instructions, pwedeng ito na yung papasadahan ng runner. +4 +4 per instruction na lang siguro
     });
   }
 

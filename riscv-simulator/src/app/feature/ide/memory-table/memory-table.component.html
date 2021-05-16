@@ -10,7 +10,7 @@
       </tr>
       <tr *ngFor="let address of memory | keyvalue: sorting">
         <td>
-          <span><b>{{ ideService.convertStringToHex(address.key) }}</b></span>
+          <span><b>{{ ideService.convertStringToHex(address.key).padStart(4,0 ) }}</b></span>
         </td>
         <td>
           <span><b>{{address.value.value }}</b></span>
