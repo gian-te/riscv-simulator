@@ -23,8 +23,8 @@ export class IdeService extends Store<IdeState> {
   error: boolean = false;
   listOfSupportedRegisters: string[] = ['X0', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'X13', 'X14', 'X15', 'X16', 'X17', 'X18', 'X19', 'X20', 'X21', 'X22', 'X23', 'X24', 'X25', 'X26', 'X27', 'X28', 'X29', 'X30', 'X31'];
   //listOfSupportedLoadStoreInstructions: string[] = ['LB', 'LH', 'LW', 'SB', 'SH', 'SW']
-  R_type: string[] = ['ADD', 'SLT'];
-  I_type: string[] = ['ADDI', 'SLTI', 'LB', 'LH', 'LW'];
+  R_type: string[] = ['ADD', 'SLT', 'ADDI', 'SLTI'];
+  I_type: string[] = ['LB', 'LH', 'LW'];
   S_type: string[] = ['SB', 'SH', 'SW'];
   SB_type: string[] = ['BEQ', 'BNE', 'BLT', 'BGE'];
   listOfSupportedDatatypes: string[] = ['.BYTE' , '.HALF', '.WORD'];
@@ -38,7 +38,15 @@ export class IdeService extends Store<IdeState> {
       'OPCODE': '0110011',
       'FUNCT3': '010',
       'FUNCT7': '0000000'
-    }
+    },
+    'ADDI': {
+      'OPCODE': '0010011',
+      'FUNCT3': '000'
+    },
+    'SLTI': {
+      'OPCODE': '0010011',
+      'FUNCT3': '010'
+    },
   };
   S_opcodes = {
     'SB': {
@@ -56,14 +64,6 @@ export class IdeService extends Store<IdeState> {
     }
   };
   I_opcodes = {
-    'ADDI': {
-      'OPCODE': '0010011',
-      'FUNCT3': '000'
-    },
-    'SLTI': {
-      'OPCODE': '0010011',
-      'FUNCT3': '010'
-    },
     'LB': {
       'OPCODE': '0000011',
       'FUNCT3': '000'
@@ -437,7 +437,7 @@ export class IdeService extends Store<IdeState> {
 
     // need help here
     let pattern1= ['R', 'register', 'register', 'register'];
-    let pattern2= ['I', 'register', 'register', 'immediate'];
+    let pattern2= ['R', 'register', 'register', 'immediate'];
     let pattern3= ['I', 'register', 'address'];
     let pattern4 = ['SB', 'register', 'register', 'offset_address'];
     let pattern5 = ['macro'];
@@ -477,7 +477,7 @@ export class IdeService extends Store<IdeState> {
       if (S_type.includes(token)) tokenType = 'S';
       if (listOfSupportedRegisters.includes(token)) tokenType = 'register';
       if (token.includes('(') && token.includes(')')) tokenType = 'address'; // lol happy path
-      if (token.includes('0x')) tokenType = 'immediate'; // lol happy path
+      if (token.includes('0X')) tokenType = 'immediate'; // lol happy path
       if (codeBySection.macro[token] != undefined || codeBySection.macro[token.toLowerCase()] != undefined) tokenType = 'macro';
       if (codeBySection.data[token] != undefined || codeBySection.data[token.toLowerCase()] != undefined) tokenType = 'variable'; // case-sensitive ba dapat to?
 
