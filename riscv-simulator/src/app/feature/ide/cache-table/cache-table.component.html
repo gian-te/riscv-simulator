@@ -1,0 +1,22 @@
+<mat-card class="card">
+  <!-- <mat-card class="card card-top"> -->
+    <p><b>Cache Memory</b></p>
+    <table style="border-collapse:collapse;" border="1px solid">
+      <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
+      <tr>
+        <td style="background-color: #9e9ac8;"> <span> Address (Hex)</span></td>
+        <td style="background-color: #9e9ac8;"> <span> Value</span></td>
+    
+      </tr>
+      <tr *ngFor="let address of memory | keyvalue: sorting">
+        <td>
+          <span><b>{{ ideService.convertStringToHex(address.key) }}</b></span>
+        </td>
+        <td>
+          <span><b>{{address.value.value }}</b></span>
+    
+        </td> 
+      </tr>
+    </table>
+  <!-- </mat-card> -->
+</mat-card>
