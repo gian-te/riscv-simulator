@@ -18,7 +18,7 @@ export class CacheTableComponent implements OnInit {
   counter: number = 0;
   ideSettings: IdeSettings = 
     {
-      numCacheBlocks: '8', // number of blocks
+      numCacheBlocks: '4', // number of blocks
       cacheBlockSize: '4'    // 4 words per block
     };
   blocks = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
