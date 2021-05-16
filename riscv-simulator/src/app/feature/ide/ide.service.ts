@@ -142,9 +142,9 @@ export class IdeService extends Store<IdeState> {
     let newInstructions: Word[] = [];
     for (let i = 0; i < inst.length; i++)
     {
-      let j = i;
-      if (j != 0 ){ j += 3;}
-      //newInstructions[j] = inst[i];
+      let j = i + 4096;
+      if (j != 4096 ){ j += 3;}
+      // try
 
       let word: Word =
       {
