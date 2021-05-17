@@ -1,7 +1,7 @@
 <!-- <mat-toolbar style="background-color: #0763a8;"> -->
     <button class="menu-button" mat-raised-button color="accent" (click)="menuClicked($event, 'assemble')">Assemble</button>
-    <button class="menu-button" mat-raised-button color="accent">Full Execution</button>
-    <button class="menu-button" mat-raised-button color="accent">Single Step</button>
+    <button class="menu-button" mat-raised-button color="accent" (click)="menuClicked($event, 'runAll')">Full Execution</button>
+    <button class="menu-button" mat-raised-button color="accent" (click)="menuClicked($event, 'runOnce')">Single Step</button>
     <!-- <button class="menu-button" mat-raised-button color="accent">Step Through</button> -->
     <!-- <button class="menu-button" mat-raised-button color="accent">Reset</button> -->
     <button class="menu-button" mat-raised-button color="accent" (click)="menuClicked($event, 'settings')">Configure...</button>

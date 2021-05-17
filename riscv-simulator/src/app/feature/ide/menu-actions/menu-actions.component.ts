@@ -31,12 +31,18 @@ export class MenuActionsComponent implements OnInit {
     {
       this.ideService.assembling(true);
     }
-    if (menu == 'reset')
+    if (menu == 'runAll')
     {
       // reset memory (data)
       // reset memory (instructions)
       // reset symbols
       // reset registers
+      this.ideService.runAll();
+    }
+    if (menu == 'runOnce')
+    {
+      this.ideService.runOnce();
+
     }
     if (menu == 'settings')
     {

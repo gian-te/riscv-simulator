@@ -135,6 +135,13 @@ export class IdeService extends Store<IdeState> {
     super(new IdeState());
   }
 
+  public runOnce(): void{
+
+  }
+
+  public runAll(): void{
+    
+  }
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
     let newInstructions: Word[] = [];
