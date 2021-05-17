@@ -149,6 +149,7 @@ export class IdeService extends Store<IdeState> {
     let instrctn = this.state.instructions.filter(instruction => instruction.address == addr);
     console.log(instrctn);
     // add logic here to run the instruction
+    // loop and then increment this.state.currentInstructionAddress by 4 words (32 bits to go to the next instruction)?
   }
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
