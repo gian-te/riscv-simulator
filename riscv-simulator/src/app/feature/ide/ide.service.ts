@@ -15,6 +15,7 @@ export class IdeState {
   isAssembling: boolean = false;
   registers: any;
   ideSettings: any;
+  currentInstructionAddress: any;
 }
 
 @Injectable()
@@ -136,11 +137,18 @@ export class IdeService extends Store<IdeState> {
   }
 
   public runOnce(): void{
-
+    console.log('running one step');
+    // start with 4096 decimal (1000 hex)
   }
 
   public runAll(): void{
-    
+    console.log('running all steps');
+    // start with 4096 decimal (1000 hex)
+    this.state.currentInstructionAddress = 4096;
+    let addr = this.state.currentInstructionAddress;
+    let instrctn = this.state.instructions.filter(instruction => instruction.address == addr);
+    console.log(instrctn);
+    // add logic here to run the instruction
   }
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
