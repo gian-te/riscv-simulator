@@ -9,7 +9,7 @@
       <td style="background-color: lightsteelblue;"> <span> Address (Hex)</span></td>
   
     </tr>
-    <tr *ngFor="let variable of variables | keyvalue: sorting">
+    <tr *ngFor="let variable of variables">
       <td>
         <span><b>{{variable.value.name }}</b></span>
       </td>
@@ -17,7 +17,7 @@
         <span><b>{{variable.value.type }}</b></span>
       </td>
       <td>
-          <span><b>{{ideService.convertStringToHex(variable.key).padStart(4, 0) }}</b></span>
+          <span><b>{{ideService.convertStringToHex(variable.address).padStart(4, 0) }}</b></span>
       </td>
     </tr>
   </table>

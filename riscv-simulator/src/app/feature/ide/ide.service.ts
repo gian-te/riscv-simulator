@@ -9,11 +9,10 @@ import { Store } from '../../core/state-management/state-management';
 export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
-  symbols: any; // most likely a dictionary
+  symbols: Word[]; // most likely a dictionary
   instructions: Word[]; // most likely an array of opcodes 
-  data: any;
+  data: Word[];
   isAssembling: boolean = false;
-  memory: any;
   registers: any;
   ideSettings: any;
 }
@@ -162,17 +161,58 @@ export class IdeService extends Store<IdeState> {
 
   // Sasalohin ni memory table (data)
   public updateData(data): void {
+    let newData: Word[] = [];
+    let addressOfNextInstruction = 0; // 0x0000 daw ung start sabi ni sir eh
+    for (let i = 0; i < data.length; i++)
+    {
+      let j = addressOfNextInstruction ; 
+      //if (i != 0) {
+        
+      // try to simulate +4 hex (tama ba to?)
+      // .byte = 8 bits = 1 word
+      // .half = 16 bits = 2 words
+      // .word = 32 bits = 4 words
+   
+      let item:any = data[i];
+      if (item.type == '.byte')
+      {
+        j =  addressOfNextInstruction + 1;
+      }
+      if (item.type == '.half')
+      {
+        j = addressOfNextInstruction + 2;
+      }
+      if (item.type == '.word')
+      {
+        j = addressOfNextInstruction + 4;
+      }
+        
+     
+    //}
+    let word: Word =
+    {
+      address: addressOfNextInstruction.toString(),
+      value:  data[i]
+    }
+    addressOfNextInstruction = j;
+      
+    newData.push(word);
+    }
     this.setState({
       ...this.state,
-      data: data,
+      data: newData,
+    });
+    this.setState({
+      ...this.state,
+      symbols: newData,
     });
   }
 
   // Sasalohin ni symbol table
-  public updateMemoryDataSegment(memory): void {
+  public updateSymbols(symbols): void {
     this.setState({
       ...this.state,
-      memory: memory,
+      symbols: symbols,
     });
   }
 

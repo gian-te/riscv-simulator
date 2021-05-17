@@ -1,6 +1,24 @@
 <mat-card class="card">
   <!-- <mat-card class="card card-top"> -->
-    <p><b>Cache Memory</b></p>
+    <div>
+    <p style="display: inline; float:left; margin-top: 10px;"><b>Cache Memory</b></p>
+    <form style="display: inline; float:right" class="example-form">
+      <mat-form-field class="example-full-width">
+        <mat-label>Search by Block Number...</mat-label>
+        <input type="text"
+               placeholder="Block #"
+               aria-label="Address"
+               matInput
+               [formControl]="myControl"
+               [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of blocks" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
+    </div>
     <table style="border-collapse:collapse;" border="1px solid">
       <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>

@@ -1,28 +1,64 @@
+<!-- Memory (Data)-->
 <mat-card class="card">
-  <!-- <mat-card class="card card-top"> -->
-    <p><b>Memory (Data)</b></p>
+    <div>
+      <p style="display: inline; float:left; margin-top: 10px;"><b>Memory (Data)</b></p>
+      <form style="display: inline; float:right">
+        <mat-form-field>
+          <mat-label>Search by Memory Address...</mat-label>
+          <input type="text"
+                 placeholder="Memory address (in hex)"
+                 aria-label="DataAddress"
+                 matInput
+                 [formControl]="myDataControl"
+                 [matAutocomplete]="autoData">
+          <mat-autocomplete #autoData="matAutocomplete">
+            <mat-option *ngFor="let word of data" [value]="word.address">
+              {{ideService.convertStringToHex(word.address).padStart(4,0)}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
+    </div>
     <table style="border-collapse:collapse;" border="1px solid">
-      <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
       <tr>
         <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let address of memory | keyvalue: sorting">
+      <tr *ngFor="let word of data">
         <td>
-          <span><b>{{ ideService.convertStringToHex(address.key).padStart(4,0 ) }}</b></span>
+          <span><b>{{ideService.convertStringToHex(word.address).padStart(4,0) }}</b></span>
         </td>
         <td>
-          <span><b>{{address.value.value }}</b></span>
+          <span><b>{{word.value.value }}</b></span>
     
         </td> 
       </tr>
     </table>
-  <!-- </mat-card> -->
 </mat-card>
+
+<!-- Memory (Instructions)-->
 <mat-card class="card">
-  <!-- <mat-card class="card card-top"> -->
-    <p><b>Memory (Instructions)</b></p>
+    <div>
+      <p style="display: inline; float:left; margin-top: 10px;"><b>Memory (Instructions)</b></p>
+      <form style="display: inline; float:right" >
+        <mat-form-field>
+          <mat-label>Search by Memory Address...</mat-label>
+          <input type="text"
+                 placeholder="Memory address (in hex)"
+                 aria-label="InstructionAddress"
+                 matInput
+                 [formControl]="myInstructionControl"
+                 [matAutocomplete]="autoInstructions">
+          <mat-autocomplete #autoInstructions="matAutocomplete">
+            <mat-option *ngFor="let word of instructions" [value]="word.address">
+              {{ideService.convertStringToHex(word.address).padStart(4,0)}}
+             
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
+    </div>
     <table style="border-collapse:collapse;" border="1px solid">
       <tr>
         <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
@@ -39,5 +75,4 @@
         </td>
       </tr>
     </table>
-  <!-- </mat-card> -->
 </mat-card>

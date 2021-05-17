@@ -27,9 +27,9 @@ export class SymbolTableComponent implements OnInit {
     const that = this;
     this.ideService.state$
       .pipe(
-        map(state => state.memory),
+        map(state => state.symbols),
         filter(data => data != null),
-        //distinctUntilChanged()
+        distinctUntilChanged()
       )
       .subscribe(variables => {
         that.variables = variables;

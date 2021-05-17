@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
-import { FormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card'
@@ -10,6 +10,7 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { IdeComponent } from './ide.component';
 import { IdeRoutingModule, routedComponents } from './ide.routing.module';
@@ -39,7 +40,8 @@ export const routes: Routes = [
     IdeRoutingModule,
     // add as needed depending on what we want to plug in to our UI
     FormsModule, // angular forms modules
-    MatMenuModule, MatGridListModule, MatCardModule, MatToolbarModule, MatButtonModule, MatDialogModule, MatInputModule// angular material modules
+    ReactiveFormsModule, // needed for formControl
+    MatMenuModule, MatGridListModule, MatCardModule, MatToolbarModule, MatButtonModule, MatDialogModule, MatInputModule, MatAutocompleteModule // angular material modules
   ],
   exports:
     [
