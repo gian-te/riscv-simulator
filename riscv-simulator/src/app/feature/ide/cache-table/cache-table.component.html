@@ -9,7 +9,7 @@
                placeholder="Block #"
                aria-label="Address"
                matInput
-               [formControl]="myControl"
+               [formControl]="myCacheBlockControl"
                [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let option of blocks" [value]="option">
@@ -26,7 +26,7 @@
         <td style="background-color: #9e9ac8;"> <span> Memory Block</span></td>
     
       </tr>
-      <tr *ngFor="let i of blocks">
+      <tr *ngFor="let i of filteredCacheBlockOptions">
         <td>
           <span><b>{{ i }}</b></span>
         </td>

@@ -26,7 +26,10 @@ export class CacheTableComponent implements OnInit {
     };
   blocks = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
 
-  myControl = new FormControl();
+  myCacheBlockControl = new FormControl();
+
+  filteredCacheBlockOptions: number[];
+
   constructor(private ideService: IdeService) {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
     // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
@@ -51,10 +54,12 @@ export class CacheTableComponent implements OnInit {
 
   ngOnInit() {
     this.memory = { };
+    this.filteredCacheBlockOptions = this.blocks;
   }
   
   ngAfterViewInit() {
     const that = this;
+
     // taga salo ng code
     this.ideService.state$
       .pipe(
@@ -86,8 +91,19 @@ export class CacheTableComponent implements OnInit {
      )
      .subscribe(newData => {
        that.ideSettings = newData;
-       that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
+       that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(0).map((x, i) => i);
+       that.filteredCacheBlockOptions = that.blocks;
      });
+    
+     this.myCacheBlockControl.valueChanges.subscribe(newValue => {
+      this.filteredCacheBlockOptions = this._filter(this.blocks, newValue);
+    });
+  }
+  
+  private _filter(collection: number[], value: string): number[] {
+    const filterValue = value;
+
+    return collection.filter(option => option.toString().includes(filterValue));
   }
   
   // hack

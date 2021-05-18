@@ -25,7 +25,7 @@
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of data">
+      <tr *ngFor="let word of filteredDataOptions">
         <td>
           <span><b>{{ideService.convertStringToHex(word.address).padStart(4,0) }}</b></span>
         </td>
@@ -65,7 +65,7 @@
         <td style="background-color: darkseagreen;"> <span> Value (32-bit Instruction Representation, in Hex)</span></td>
     
       </tr>
-      <tr *ngFor="let word of instructions">
+      <tr *ngFor="let word of filteredInstructionOptions">
         <td>
           <span><b> {{ ideService.convertStringToHex(word.address) }}</b></span>
         </td>
