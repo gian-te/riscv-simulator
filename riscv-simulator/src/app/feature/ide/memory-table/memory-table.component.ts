@@ -113,9 +113,9 @@ export class MemoryTableComponent implements OnInit {
   }
 
   private _filter(collection: Word[], value: string): Word[] {
-    const filterValue = value.toLowerCase();
+    const filterValue = value.toUpperCase();
 
-    return collection.filter(option => option.hexAddress.includes(filterValue));
+    return collection.filter(option => option.hexAddress.toUpperCase().includes(filterValue));
   }
   
   
