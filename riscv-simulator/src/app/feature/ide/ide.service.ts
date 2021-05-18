@@ -211,6 +211,7 @@ export class IdeService extends Store<IdeState> {
     this.resetRegisters();
   }
 
+  // TODO: Tanggalin na lang pag ready na
   mockRegisterValues() {
         /** mock data */
         this.state.registerList[5] = '00000004'
