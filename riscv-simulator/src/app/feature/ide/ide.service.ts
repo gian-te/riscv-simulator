@@ -164,6 +164,14 @@ export class IdeService extends Store<IdeState> {
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)) // initialize data segment section in memory
     })
+    /** mock data */
+    this.state.registerList[5] = '00000004'
+    this.state.dataSegmentList[1] = '10001000'
+    this.state.dataSegmentList[2] = '10011001'
+    this.state.dataSegmentList[3] = '10101010'
+    this.state.dataSegmentList[4] = '10111011'
+    this.state.registerList[10] = 'FFFFFFFF'
+    this.state.registerList[11] = '00000004'
 
   }
 
@@ -173,25 +181,18 @@ export class IdeService extends Store<IdeState> {
     const currentInstruction = this.state.instructionByAddress[this.state.currentInstructionAddress].basic
     console.log(this.state.currentInstructionAddress, currentInstruction)
 
-    /** mock data */
-    this.state.registerList[5] = '00000004'
-    this.state.dataSegmentList[1] = '10001000'
-    this.state.dataSegmentList[2] = '10011001'
-    this.state.dataSegmentList[3] = '10101010'
-    this.state.dataSegmentList[4] = '10111011'
-
     switch (currentInstruction[0].token) {
       case 'ADD':
-        const t1 = currentInstruction[1].token
-        const t2 = currentInstruction[2].token
-        const t3 = currentInstruction[3].token
-        this.add(t1, t2, t3)
+        this.add(currentInstruction);
         break;
       case 'SLT':
+        this.slt(currentInstruction);
         break;
       case 'ADDI':
+        this.addi(currentInstruction);
         break;
       case 'SLTI':
+        this.slti(currentInstruction);
         break;
       case 'SB':
         break;
@@ -224,8 +225,57 @@ export class IdeService extends Store<IdeState> {
     })
   }
 
-  private add(t1, t2, t3) {
-    console.log(`adding ${t2} and ${t3}`)
+  private add(instruction) {
+    const rd_index = instruction[1].token.slice(1)
+    const rs1_index = instruction[2].token.slice(1)
+    const rs2_index = instruction[3].token.slice(1)
+    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
+    const rs2Dec = this.hex2dec(this.state.registerList[Number(rs2_index)])
+    const rdDec = rs1Dec + rs2Dec;
+    this.state.registerList[rd_index] = this.dec2hex(rdDec, 8)
+    console.log(this.state.registerList)
+  }
+
+  private slt(instruction) {
+    const rd_index = instruction[1].token.slice(1)
+    const rs1_index = instruction[2].token.slice(1)
+    const rs2_index = instruction[3].token.slice(1)
+    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
+    const rs2Dec = this.hex2dec(this.state.registerList[Number(rs2_index)])
+    let rd = 0;
+
+    if (rs1Dec < rs2Dec) {
+      rd = 1
+    }
+
+    this.state.registerList[rd_index] = this.dec2hex(rd, 8);
+    console.log(this.state.registerList)
+  }
+
+  private addi(instruction) {
+    const rd_index = instruction[1].token.slice(1)
+    const rs1_index = instruction[2].token.slice(1)
+    const immediateDec = instruction[3].token.includes('0x') ? this.hex2dec(instruction[3].token.slice(2)) : Number(instruction[3].token)
+    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
+    const rd = rs1Dec + immediateDec;
+
+    this.state.registerList[rd_index] = this.dec2hex(rd, 8)
+    console.log(this.state.registerList)
+  }
+
+  private slti(instruction) {
+    const rd_index = instruction[1].token.slice(1)
+    const rs1_index = instruction[2].token.slice(1)
+    const immediateDec = instruction[3].token.includes('0x') ? this.hex2dec(instruction[3].token.slice(2)) : Number(instruction[3].token)
+    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
+    let rd = 0;
+
+    if (rs1Dec < immediateDec) {
+      rd = 1
+    }
+
+    this.state.registerList[rd_index] = this.dec2hex(rd, 8);
+    console.log(this.state.registerList)
   }
 
   private lb(instruction) {
@@ -246,6 +296,7 @@ export class IdeService extends Store<IdeState> {
 
     const byteHex = this.bin2hex(byteBinary)
     this.state.registerList[rd_index] = byteHex;
+    console.log(this.state.registerList)
   }
 
   private lh(instruction) {
@@ -267,6 +318,7 @@ export class IdeService extends Store<IdeState> {
 
     const halfWordHex = this.bin2hex(halfWordBinary);
     this.state.registerList[rd_index] = halfWordHex;
+    console.log(this.state.registerList)
   }
 
   private lw(instruction) {
@@ -760,7 +812,7 @@ export class IdeService extends Store<IdeState> {
       else if (S_type.includes(token)) tokenType = 'S';
       else if (listOfSupportedRegisters.includes(token)) tokenType = 'register';
       else if (token.includes('(') && token.includes(')')) tokenType = 'address'; // lol happy path
-      else if (token.includes('0X')) tokenType = 'immediate'; // lol happy path
+      else if (token.includes('0X') || token.match(/^\-?(\d*)$/)) tokenType = 'immediate'; // lol happy path
       else if (token.slice(-1) === ':') {
         if (symbolList.includes(token.slice(0, -1))) {
           tokenType = 'branch';
@@ -899,11 +951,23 @@ export class IdeService extends Store<IdeState> {
     return ("0".repeat(n) + (parseInt(hex, 16)).toString(2)).substr(-n);
   }
 
-  private hex2dec(hex) {
-    return parseInt(hex, 16)
-  }
-
   private bin2hex(bin: string) {
     return parseInt(bin, 2).toString(16).toUpperCase();
+  }
+
+  private dec2hex(dec, n) {
+    return ("0".repeat(n) + (dec >>> 0).toString(16).toUpperCase()).substr(-n);
+  }
+
+  private hex2dec(hex) {
+    if (hex.length % 2 != 0) {
+      hex = "0" + hex;
+    }
+    var num = parseInt(hex, 16);
+    var maxVal = Math.pow(2, hex.length / 2 * 8);
+    if (num > maxVal / 2 - 1) {
+      num = num - maxVal
+    }
+    return num;
   }
 }
