@@ -238,7 +238,8 @@ export class IdeService extends Store<IdeState> {
 
     this.setState({
       ...this.state,
-      currentInstructionAddress: this.state.currentInstructionAddress + 4
+      currentInstructionAddress: this.state.currentInstructionAddress + 4,
+      registers: this.state.registers
     })
   }
 
@@ -301,11 +302,8 @@ export class IdeService extends Store<IdeState> {
     const wordBinary = `${byte4Binary}${byte3Binary}${byte2Binary}${byte1Binary}`;
     const wordHex = this.bin2hex(wordBinary);
     this.state.registerList[rd_index] = wordHex;
-    let regs = this.state.registers;
-    regs[instruction[1].token] = wordHex;
+    this.state.registers[instruction[1].token] = wordHex;
 
-    // publish an update for the register table to catch the updated register contents
-    // this.updateRegisters(regs);
     console.log(this.state.registerList)
   }
 
