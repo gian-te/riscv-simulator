@@ -146,7 +146,7 @@ export class IdeService extends Store<IdeState> {
     // start with 4096 decimal (1000 hex)
     this.state.currentInstructionAddress = 4096;
     let addr = this.state.currentInstructionAddress;
-    let instrctn = this.state.instructions.filter(instruction => instruction.address == addr);
+    let instrctn = this.state.instructions.filter(instruction => instruction.decimalAddress == addr);
     console.log(instrctn);
     // add logic here to run the instruction
     // loop and then increment this.state.currentInstructionAddress by 4 words (32 bits to go to the next instruction)?
@@ -164,7 +164,8 @@ export class IdeService extends Store<IdeState> {
 
       let word: Word =
       {
-        address: j.toString(),
+        decimalAddress: j.toString(),
+        hexAddress: this.convertStringToHex(j.toString()),
         value:  inst[i]
       }
       newInstructions.push(word);
@@ -207,8 +208,9 @@ export class IdeService extends Store<IdeState> {
     //}
     let word: Word =
     {
-      address: addressOfNextInstruction.toString(),
-      value:  data[i]
+      decimalAddress: addressOfNextInstruction.toString(),
+        hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
+        value:  data[i]
     }
     addressOfNextInstruction = j;
       

@@ -12,8 +12,8 @@
                  [formControl]="myDataControl"
                  [matAutocomplete]="autoData">
           <mat-autocomplete #autoData="matAutocomplete">
-            <mat-option *ngFor="let word of data" [value]="word.address">
-              {{ideService.convertStringToHex(word.address).padStart(4,0)}}
+            <mat-option *ngFor="let word of data" [value]="word.hexAddress">
+              {{word.hexAddress.padStart(4,0)}}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -27,7 +27,7 @@
       </tr>
       <tr *ngFor="let word of filteredDataOptions">
         <td>
-          <span><b>{{ideService.convertStringToHex(word.address).padStart(4,0) }}</b></span>
+          <span><b>{{word.hexAddress.padStart(4,0) }}</b></span>
         </td>
         <td>
           <span><b>{{word.value.value }}</b></span>
@@ -51,8 +51,8 @@
                  [formControl]="myInstructionControl"
                  [matAutocomplete]="autoInstructions">
           <mat-autocomplete #autoInstructions="matAutocomplete">
-            <mat-option *ngFor="let word of instructions" [value]="word.address">
-              {{ideService.convertStringToHex(word.address).padStart(4,0)}}
+            <mat-option *ngFor="let word of instructions" [value]="word.hexAddress">
+              {{word.hexAddress.padStart(4,0)}}
              
             </mat-option>
           </mat-autocomplete>
@@ -67,7 +67,7 @@
       </tr>
       <tr *ngFor="let word of filteredInstructionOptions">
         <td>
-          <span><b> {{ ideService.convertStringToHex(word.address) }}</b></span>
+          <span><b> {{ word.hexAddress}}</b></span>
         </td>
         <td>
           <span><b> {{'0x' +ideService.convertBinaryToHex(word.value).padStart(8, 0) }}</b></span>
