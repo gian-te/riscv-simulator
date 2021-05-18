@@ -59,7 +59,7 @@ export class CacheTableComponent implements OnInit {
   
   ngAfterViewInit() {
     const that = this;
-
+    this.ideService.updateSettings(this.ideSettings);
     // taga salo ng code
     this.ideService.state$
       .pipe(

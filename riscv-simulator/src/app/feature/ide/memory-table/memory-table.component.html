@@ -22,6 +22,7 @@
     <table style="border-collapse:collapse;" border="1px solid">
       <tr>
         <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
+        <td style="background-color: darkseagreen;"> <span> Memory Block</span></td>
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
@@ -30,8 +31,10 @@
           <span><b>{{word.hexAddress.padStart(4,0) }}</b></span>
         </td>
         <td>
+          <span><b> {{ word.memoryBlock}}</b></span>
+        </td>
+        <td>
           <span><b>{{word.value.value }}</b></span>
-    
         </td> 
       </tr>
     </table>
@@ -62,7 +65,8 @@
     <table style="border-collapse:collapse;" border="1px solid">
       <tr>
         <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
-        <td style="background-color: darkseagreen;"> <span> Value (32-bit Instruction Representation, in Hex)</span></td>
+        <td style="background-color: darkseagreen;"> <span> Memory Block</span></td>
+        <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
       <tr *ngFor="let word of filteredInstructionOptions">
@@ -70,8 +74,10 @@
           <span><b> {{ word.hexAddress}}</b></span>
         </td>
         <td>
+          <span><b> {{ word.memoryBlock}}</b></span>
+        </td>
+        <td>
           <span><b> {{'0x' +ideService.convertBinaryToHex(word.value).padStart(8, 0) }}</b></span>
-    
         </td>
       </tr>
     </table>

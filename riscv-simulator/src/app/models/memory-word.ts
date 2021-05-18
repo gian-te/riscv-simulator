@@ -6,4 +6,5 @@ export interface Word {
   value: string;
   colSpan?: "1";
   rowSpan?: "1";
+  memoryBlock?: string;
 }

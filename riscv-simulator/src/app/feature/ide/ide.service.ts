@@ -14,7 +14,7 @@ export class IdeState {
   data: Word[];
   isAssembling: boolean = false;
   registers: any;
-  ideSettings: any;
+  ideSettings: IdeSettings;
   currentInstructionAddress: any;
 }
 
@@ -166,7 +166,8 @@ export class IdeService extends Store<IdeState> {
       {
         decimalAddress: j.toString(),
         hexAddress: this.convertStringToHex(j.toString()),
-        value:  inst[i]
+        value: inst[i],
+        memoryBlock: (Math.floor((newInstructions.length + this.state.data.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
       }
       newInstructions.push(word);
     }
@@ -206,15 +207,26 @@ export class IdeService extends Store<IdeState> {
         
      
     //}
-    let word: Word =
-    {
-      decimalAddress: addressOfNextInstruction.toString(),
+      /*
+      0 = 2048 %
+      1 =
+      2 =
+      3 =
+      4 =
+      5 =
+      ...
+      2047 =
+      */ 
+      let word: Word =
+      {
+        decimalAddress: addressOfNextInstruction.toString(),
         hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
-        value:  data[i]
-    }
-    addressOfNextInstruction = j;
-      
-    newData.push(word);
+        value: data[i],
+        memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+      }
+      addressOfNextInstruction = j;
+        
+      newData.push(word);
     }
     this.setState({
       ...this.state,

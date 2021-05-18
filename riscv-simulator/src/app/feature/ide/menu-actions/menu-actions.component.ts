@@ -18,7 +18,7 @@ export class MenuActionsComponent implements OnInit {
   {
     this.ideSettings = {
       cacheBlockSize: '4',// 4 words per block
-      numCacheBlocks: '256' // 256 blocks
+      numCacheBlocks: '4' // 4 blocks
     }
    
 
