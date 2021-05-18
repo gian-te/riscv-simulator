@@ -228,21 +228,15 @@ export class IdeService extends Store<IdeState> {
         
       newData.push(word);
     }
+
     this.setState({
       ...this.state,
       data: newData,
     });
+
     this.setState({
       ...this.state,
       symbols: newData,
-    });
-  }
-
-  // Sasalohin ni symbol table
-  public updateSymbols(symbols): void {
-    this.setState({
-      ...this.state,
-      symbols: symbols,
     });
   }
 
@@ -270,6 +264,12 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       ideSettings: ideSettings,
     });
+
+    if (this.state.code)
+    {
+      // refresh the memory by trigerring a new build
+      this.updateCode(this.state.code);
+    }
   }
 
   public updateCode(newCode) {
@@ -525,7 +525,8 @@ export class IdeService extends Store<IdeState> {
         }
         else if (this.patternSimilar(lineTokenTypes, pattern1))  // if approaching exact match, continue
         {
-          console.log('similar match, assembling .data line...');
+          // console.log('similar match, assembling .data line...');
+          // do nothing, continue assembling the line
         }
         else {
           // error na
@@ -686,7 +687,8 @@ export class IdeService extends Store<IdeState> {
         || this.patternSimilar(lineTokenTypes, pattern10))
       // if approaching exact match, continue
       {
-        console.log('similar match, assembling .text line...');
+        // console.log('similar match, assembling .text line...');
+        // do nothing, assemble next line
       }
       else {
         console.log('error at ', codeLines)

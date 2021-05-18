@@ -27,6 +27,7 @@ export class MenuActionsComponent implements OnInit {
   menuClicked(e, menu: string) {
     console.log(e);
     console.log(menu);
+    e.stopPropagation();
     if (menu == 'assemble')
     {
       this.ideService.assembling(true);

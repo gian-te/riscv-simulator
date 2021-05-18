@@ -21,7 +21,7 @@ export class MemoryTableComponent implements OnInit {
   counter: number = 0;
   ideSettings: IdeSettings = 
     {
-      numCacheBlocks: '128',
+      numCacheBlocks: '4',
       cacheBlockSize: '4'
     };
 
@@ -68,6 +68,8 @@ export class MemoryTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(newInstructions => {
+        that.filteredInstructionOptions = [];
+        that.instructions = [];
         that.instructions = newInstructions;
         that.filteredInstructionOptions = this.instructions;
 
@@ -81,6 +83,8 @@ export class MemoryTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(newData => {
+        that.filteredDataOptions = [];
+        that.data = [];
         that.data = newData;
         that.filteredDataOptions = this.data;
 

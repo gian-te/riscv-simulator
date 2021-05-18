@@ -89,8 +89,8 @@ export class CacheTableComponent implements OnInit {
        filter(data => data != null),
        distinctUntilChanged()
      )
-     .subscribe(newData => {
-       that.ideSettings = newData;
+     .subscribe(newSettings => {
+       that.ideSettings = newSettings;
        that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(0).map((x, i) => i);
        that.filteredCacheBlockOptions = that.blocks;
      });
