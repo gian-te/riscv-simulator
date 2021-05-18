@@ -265,6 +265,8 @@ export class IdeService extends Store<IdeState> {
 
     const byteHex = this.bin2hex(byteBinary)
     this.state.registerList[rd_index] = byteHex;
+    this.state.registers[instruction[1].token] = byteHex;
+    
   }
 
   private lh(instruction) {
@@ -286,6 +288,7 @@ export class IdeService extends Store<IdeState> {
 
     const halfWordHex = this.bin2hex(halfWordBinary);
     this.state.registerList[rd_index] = halfWordHex;
+    this.state.registers[instruction[1].token] = halfWordHex;
   }
 
   private lw(instruction) {
