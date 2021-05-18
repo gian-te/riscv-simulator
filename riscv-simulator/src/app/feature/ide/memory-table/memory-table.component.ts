@@ -1,11 +1,12 @@
 
 import { Component, OnInit } from '@angular/core';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
 import { Word } from '../../../models/memory-word'
 import { IdeSettings } from 'src/app/models/ide-settings';
 // needed for search bar
 import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -20,14 +21,18 @@ export class MemoryTableComponent implements OnInit {
   counter: number = 0;
   ideSettings: IdeSettings = 
     {
-      numCacheBlocks: '128',
+      numCacheBlocks: '4',
       cacheBlockSize: '4'
     };
 
   myDataControl = new FormControl();
   myInstructionControl = new FormControl();
   
-  constructor(private ideService: IdeService) {
+  filteredDataOptions: Word[];
+  filteredInstructionOptions: Word[];
+
+
+  constructor(public ideService: IdeService) {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
     // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
     this.instructions = [
@@ -63,7 +68,11 @@ export class MemoryTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(newInstructions => {
+        that.filteredInstructionOptions = [];
+        that.instructions = [];
         that.instructions = newInstructions;
+        that.filteredInstructionOptions = this.instructions;
+
       });
     
       // taga salo ng data
@@ -74,9 +83,11 @@ export class MemoryTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(newData => {
+        that.filteredDataOptions = [];
+        that.data = [];
         that.data = newData;
-        // pagka salo ng data, kailangan natin sabihin bigyan ng address yung data
-        // this.populateMemoryDataSegment();
+        that.filteredDataOptions = this.data;
+
       });
     
      // taga salo ng ide settings, pang divide ng tables
@@ -88,10 +99,27 @@ export class MemoryTableComponent implements OnInit {
      )
      .subscribe(newData => {
        that.ideSettings = newData;
-
      });
+    
+     // handle filters
+    this.myDataControl.valueChanges.subscribe(newValue => {
+      this.filteredDataOptions = this._filter(this.data, newValue);
+    });
+
+    this.myInstructionControl.valueChanges.subscribe(newValue => {
+      this.filteredInstructionOptions = this._filter(this.instructions, newValue);
+    });
+
+  }
+
+  private _filter(collection: Word[], value: string): Word[] {
+    const filterValue = value.toLowerCase();
+
+    return collection.filter(option => option.hexAddress.includes(filterValue));
   }
   
+  
+
   // populateMemoryDataSegment()
   // {
   //   this.memory = {};

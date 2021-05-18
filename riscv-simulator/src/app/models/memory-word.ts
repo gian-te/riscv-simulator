@@ -1,8 +1,10 @@
 // represents a 32-bitword in the memory
 export interface Word {
   color?: string; // aesthetic purposes
-  address: string;
+  hexAddress: string;
+  decimalAddress: string;
   value: string;
   colSpan?: "1";
   rowSpan?: "1";
+  memoryBlock?: string;
 }

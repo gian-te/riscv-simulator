@@ -7,11 +7,14 @@ import { Store } from '../../core/state-management/state-management';
 
 type TInstruction = {
   address: string,
+  decimalAddress: string,
+  hexAddress: string,
   value: string,
   basic: {
     token: string;
     type: string;
-  }[]
+  }[],
+  memoryBlock: string;
 }
 
 // components will subscribe here
@@ -32,7 +35,7 @@ export class IdeState {
   data: Word[];
   isAssembling: boolean = false;
   registers: any = {};
-  ideSettings: any;
+  ideSettings: IdeSettings;
   currentInstructionAddress: number = 4096;
   codeLines: { token: string; type: string }[][];
   registerList: string[];
@@ -288,7 +291,7 @@ export class IdeService extends Store<IdeState> {
     // start with 4096 decimal (1000 hex)
     this.state.currentInstructionAddress = 4096;
     let addr = this.state.currentInstructionAddress;
-    // let instrctn = this.state.instructions.filter(instruction => instruction.address == addr);
+    // let instrctn = this.state.instructions.filter(instruction => instruction.decimalAddress == addr);
     // console.log(instrctn);
     // add logic here to run the instruction
     // loop and then increment this.state.currentInstructionAddress by 4 words (32 bits to go to the next instruction)?
@@ -307,7 +310,10 @@ export class IdeService extends Store<IdeState> {
       {
         address: j.toString(),
         value: inst[i],
-        basic: this.state.codeLines[i]
+        basic: this.state.codeLines[i],
+        decimalAddress: j.toString(),
+        hexAddress: this.convertStringToHex(j.toString()),
+        memoryBlock: (Math.floor((newInstructions.length + this.state.data.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
       }
       newInstructions.push(word);
     }
@@ -353,30 +359,36 @@ export class IdeService extends Store<IdeState> {
 
 
       //}
+      /*
+      0 = 2048 %
+      1 =
+      2 =
+      3 =
+      4 =
+      5 =
+      ...
+      2047 =
+      */
       let word: Word =
       {
-        address: addressOfNextInstruction.toString(),
-        value: data[i]
+        decimalAddress: addressOfNextInstruction.toString(),
+        hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
+        value: data[i],
+        memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
       }
       addressOfNextInstruction = j;
 
       newData.push(word);
     }
+
     this.setState({
       ...this.state,
       data: newData,
     });
+
     this.setState({
       ...this.state,
       symbols: newData,
-    });
-  }
-
-  // Sasalohin ni symbol table
-  public updateSymbols(symbols): void {
-    this.setState({
-      ...this.state,
-      symbols: symbols,
     });
   }
 
@@ -404,6 +416,11 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       ideSettings: ideSettings,
     });
+
+    if (this.state.code) {
+      // refresh the memory by trigerring a new build
+      this.updateCode(this.state.code);
+    }
   }
 
   public updateCode(newCode) {
@@ -664,7 +681,8 @@ export class IdeService extends Store<IdeState> {
         }
         else if (this.patternSimilar(lineTokenTypes, pattern1))  // if approaching exact match, continue
         {
-          console.log('similar match, assembling .data line...');
+          // console.log('similar match, assembling .data line...');
+          // do nothing, continue assembling the line
         }
         else {
           // error na
@@ -825,7 +843,8 @@ export class IdeService extends Store<IdeState> {
         || this.patternSimilar(lineTokenTypes, pattern10))
       // if approaching exact match, continue
       {
-        console.log('similar match, assembling .text line...');
+        // console.log('similar match, assembling .text line...');
+        // do nothing, assemble next line
       }
       else {
         console.log('error at ', codeLines)

@@ -29,8 +29,16 @@ export class TextEditorComponent implements OnInit {
       .subscribe(isAssembling => {
         if (isAssembling) {
           console.log('assembling...');
-          this.ideService.updateCode(this.code);  // update the string code
+          if (this.code)
+          {
+            this.ideService.updateCode(this.code);  // update the string code
+          }
           this.ideService.assembling(false);
+        }
+        else
+        {
+          console.log('recevied assembling event but the value was false.')  
+          //this.ideService.assembling(false);
         }
       });
   }
