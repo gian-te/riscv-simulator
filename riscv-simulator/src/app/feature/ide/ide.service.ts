@@ -252,6 +252,7 @@ export class IdeService extends Store<IdeState> {
     const rs2Dec = this.hex2dec(this.state.registerList[Number(rs2_index)])
     const rdDec = rs1Dec + rs2Dec;
     this.state.registerList[rd_index] = this.dec2hex(rdDec, 8)
+    this.state.registers[instruction[1].token] = this.dec2hex(rdDec, 8);
     console.log(this.state.registerList)
   }
 
@@ -268,6 +269,7 @@ export class IdeService extends Store<IdeState> {
     }
 
     this.state.registerList[rd_index] = this.dec2hex(rd, 8);
+    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
     console.log(this.state.registerList)
   }
 
@@ -279,6 +281,7 @@ export class IdeService extends Store<IdeState> {
     const rd = rs1Dec + immediateDec;
 
     this.state.registerList[rd_index] = this.dec2hex(rd, 8)
+    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
     console.log(this.state.registerList)
   }
 
@@ -294,6 +297,7 @@ export class IdeService extends Store<IdeState> {
     }
 
     this.state.registerList[rd_index] = this.dec2hex(rd, 8);
+    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
     console.log(this.state.registerList)
   }
 
