@@ -1,11 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { UnsubscriptionError } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Subject, UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
 import { Word } from 'src/app/models/memory-word';
 
 import { Store } from '../../core/state-management/state-management';
 
 // components will subscribe here
+
 export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
@@ -18,8 +20,18 @@ export class IdeState {
   currentInstructionAddress: any;
 }
 
+
 @Injectable()
 export class IdeService extends Store<IdeState> {
+
+  private assembleSubject = new Subject<any>();
+  sendAssembleEvent() {
+    this.assembleSubject.next();
+  }
+  
+  assemble(): Observable<any>{ 
+    return this.assembleSubject.asObservable();
+  }
 
   branch_address = {}
   error: boolean = false;
