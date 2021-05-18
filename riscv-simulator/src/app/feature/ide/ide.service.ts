@@ -170,15 +170,45 @@ export class IdeService extends Store<IdeState> {
     'X29': '11101',
     'X30': '11110',
     'X31': '11111',
-  }
+  };
+  Register_Default_Values = 
+  {
+    'X0':'00000000',
+    'X1':'00000000',
+    'X2':'00000000',
+    'X3':'00000000',
+    'X4':'00000000',
+    'X5':'00000000',
+    'X6':'00000000',
+    'X7':'00000000',
+    'X8':'00000000',
+    'X9':'00000000',
+    'X10':'00000000',
+    'X11':'00000000',
+    'X12':'00000000',
+    'X13':'00000000',
+    'X14':'00000000',
+    'X15':'00000000',
+    'X16':'00000000',
+    'X17':'00000000',
+    'X18':'00000000',
+    'X19':'00000000',
+    'X20':'00000000',
+    'X21':'00000000',
+    'X22':'00000000',
+    'X23':'00000000',
+    'X24':'00000000',
+    'X25':'00000000',
+    'X26':'00000000',
+    'X27':'00000000',
+    'X28':'00000000',
+    'X29':'00000000',
+    'X30':'00000000',
+    'X31':'00000000'};
 
   constructor() {
     super(new IdeState());
-    this.setState({
-      ...this.state,
-      registerList: Array(33).fill('0'.repeat(8)), // initialize register
-      dataSegmentList: Array(524).fill('0'.repeat(8)) // initialize data segment section in memory
-    })
+    this.resetRegisters();
     /** mock data */
     this.state.registerList[5] = '00000004'
     this.state.dataSegmentList[1] = '10001000'
@@ -188,6 +218,15 @@ export class IdeService extends Store<IdeState> {
     this.state.registerList[10] = 'FFFFFFFF'
     this.state.registerList[11] = '00000004'
 
+  }
+
+  public resetRegisters(): void{
+    this.setState({
+      ...this.state,
+      registerList: Array(33).fill('0'.repeat(8)), // initialize register
+      dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
+      registers: { ...this.Register_Default_Values }
+    })
   }
 
   public runOnce(): void {
@@ -237,8 +276,9 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       currentInstructionAddress: this.state.currentInstructionAddress + 4,
-      registers: this.state.registers
     })
+
+    this.updateRegisters(this.state.registers);
   }
 
   private add(instruction) {
@@ -436,8 +476,6 @@ export class IdeService extends Store<IdeState> {
         j = addressOfNextInstruction + 4;
       }
 
-
-      //}
       /*
       0 = 2048 %
       1 =
@@ -588,10 +626,9 @@ export class IdeService extends Store<IdeState> {
       this.updateInstructions(instructionsIn32BitFormat);
     }
 
-    // this.setState({
-    //   ...this.state,
-    //   currentInstructionAddress: this.state.currentInstructionAddress
-    // })
+    // reset registers on assemble
+    this.updateRegisters({ ...this.Register_Default_Values });
+
 
     // reset error flag for next Assemble
     this.error = false;
