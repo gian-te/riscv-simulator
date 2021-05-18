@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { UnsubscriptionError } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Subject, UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
 import { Word } from 'src/app/models/memory-word';
 
@@ -18,6 +19,7 @@ type TInstruction = {
 }
 
 // components will subscribe here
+
 export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
@@ -43,8 +45,24 @@ export class IdeState {
   dataSegmentPointer: number = 0;
 }
 
+
 @Injectable()
 export class IdeService extends Store<IdeState> {
+
+  private assembleSubject = new Subject<any>();
+  sendAssembleEvent() {
+    // reset counter on assemble
+    this.state.currentInstructionAddress = 4096;
+    this.setState({
+      ...this.state,
+      currentInstructionAddress: this.state.currentInstructionAddress
+    })
+    this.assembleSubject.next();
+  }
+
+  assemble(): Observable<any> {
+    return this.assembleSubject.asObservable();
+  }
 
   branch_address = {}
   error: boolean = false;
@@ -221,7 +239,8 @@ export class IdeService extends Store<IdeState> {
 
     this.setState({
       ...this.state,
-      currentInstructionAddress: this.state.currentInstructionAddress + 4
+      currentInstructionAddress: this.state.currentInstructionAddress + 4,
+      registers: this.state.registers
     })
   }
 
@@ -297,6 +316,7 @@ export class IdeService extends Store<IdeState> {
     const byteHex = this.bin2hex(byteBinary)
     this.state.registerList[rd_index] = byteHex;
     console.log(this.state.registerList)
+    this.state.registers[instruction[1].token] = byteHex;
   }
 
   private lh(instruction) {
@@ -319,6 +339,7 @@ export class IdeService extends Store<IdeState> {
     const halfWordHex = this.bin2hex(halfWordBinary);
     this.state.registerList[rd_index] = halfWordHex;
     console.log(this.state.registerList)
+    this.state.registers[instruction[1].token] = halfWordHex;
   }
 
   private lw(instruction) {
@@ -335,6 +356,8 @@ export class IdeService extends Store<IdeState> {
     const wordBinary = `${byte4Binary}${byte3Binary}${byte2Binary}${byte1Binary}`;
     const wordHex = this.bin2hex(wordBinary);
     this.state.registerList[rd_index] = wordHex;
+    this.state.registers[instruction[1].token] = wordHex;
+
     console.log(this.state.registerList)
   }
 
@@ -450,16 +473,6 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registers: listOfSupportedRegisters,
     });
-  }
-
-
-  public assembling(data: boolean) {
-    console.log('setting isAssembling to ' + data);
-    this.setState({
-      ...this.state,
-      isAssembling: data,
-    });
-    console.log(this.state.isAssembling);
   }
 
   // sasalohin ni memory table

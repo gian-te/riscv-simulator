@@ -1,5 +1,6 @@
 
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
 
@@ -21,23 +22,11 @@ export class TextEditorComponent implements OnInit {
 
   ngAfterViewInit() {
     const that = this;
-    this.ideService.state$
-      .pipe(
-        map(state => state.isAssembling),
-        distinctUntilChanged()
-      )
-      .subscribe(isAssembling => {
-        if (isAssembling) {
-          console.log('assembling...');
-          if (this.code) {
-            this.ideService.updateCode(this.code);  // update the string code
-          }
-          this.ideService.assembling(false);
-        }
-        else {
-          console.log('recevied assembling event but the value was false.')
-          //this.ideService.assembling(false);
-        }
-      });
+    this.clickEventsubscription = this.ideService.assemble().subscribe(() => {
+      console.log('assembling...');
+      if (this.code) {
+        this.ideService.updateCode(this.code);  // update the string code
+      }
+    })
   }
 }

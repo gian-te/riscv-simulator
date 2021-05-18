@@ -30,7 +30,7 @@ export class MenuActionsComponent implements OnInit {
     e.stopPropagation();
     if (menu == 'assemble')
     {
-      this.ideService.assembling(true);
+      this.ideService.sendAssembleEvent();
     }
     if (menu == 'runAll')
     {
