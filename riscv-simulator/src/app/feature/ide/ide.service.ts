@@ -209,15 +209,17 @@ export class IdeService extends Store<IdeState> {
   constructor() {
     super(new IdeState());
     this.resetRegisters();
-    /** mock data */
-    this.state.registerList[5] = '00000004'
-    this.state.dataSegmentList[1] = '10001000'
-    this.state.dataSegmentList[2] = '10011001'
-    this.state.dataSegmentList[3] = '10101010'
-    this.state.dataSegmentList[4] = '10111011'
-    this.state.registerList[10] = 'FFFFFFFF'
-    this.state.registerList[11] = '00000004'
+  }
 
+  mockRegisterValues() {
+        /** mock data */
+        this.state.registerList[5] = '00000004'
+        this.state.dataSegmentList[1] = '10001000'
+        this.state.dataSegmentList[2] = '10011001'
+        this.state.dataSegmentList[3] = '10101010'
+        this.state.dataSegmentList[4] = '10111011'
+        this.state.registerList[10] = 'FFFFFFFF'
+        this.state.registerList[11] = '00000004'
   }
 
   public resetRegisters(): void{
@@ -227,6 +229,9 @@ export class IdeService extends Store<IdeState> {
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
       registers: { ...this.Register_Default_Values }
     })
+
+    // TODO: Tanggalin na lang pag ready na
+    this.mockRegisterValues();
   }
 
   public runOnce(): void {
@@ -627,7 +632,7 @@ export class IdeService extends Store<IdeState> {
     }
 
     // reset registers on assemble
-    this.updateRegisters({ ...this.Register_Default_Values });
+    this.resetRegisters();
 
 
     // reset error flag for next Assemble
