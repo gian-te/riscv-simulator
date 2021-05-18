@@ -69,7 +69,7 @@
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of filteredInstructionOptions">
+      <tr *ngFor="let word of filteredInstructionOptions"  [ngStyle]="{'background': word.color }">
         <td>
           <span><b> {{ word.hexAddress}}</b></span>
         </td>

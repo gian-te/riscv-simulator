@@ -53,10 +53,7 @@ export class IdeService extends Store<IdeState> {
   sendAssembleEvent() {
     // reset counter on assemble
     this.state.currentInstructionAddress = 4096;
-    this.setState({
-      ...this.state,
-      currentInstructionAddress: this.state.currentInstructionAddress
-    })
+
     this.assembleSubject.next();
   }
 
@@ -408,8 +405,11 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       instructions: newInstructions, // itong $state.instructions, pwedeng ito na yung papasadahan ng runner. +4 +4 per instruction na lang siguro
-      instructionByAddress: normalizeInstruction
+      instructionByAddress: normalizeInstruction,
+      currentInstructionAddress: this.state.currentInstructionAddress
     });
+
+  
   }
 
   // Sasalohin ni memory table (data)
@@ -588,6 +588,10 @@ export class IdeService extends Store<IdeState> {
       this.updateInstructions(instructionsIn32BitFormat);
     }
 
+    // this.setState({
+    //   ...this.state,
+    //   currentInstructionAddress: this.state.currentInstructionAddress
+    // })
 
     // reset error flag for next Assemble
     this.error = false;

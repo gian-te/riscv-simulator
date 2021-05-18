@@ -30,7 +30,8 @@ export class MemoryTableComponent implements OnInit {
   
   filteredDataOptions: Word[];
   filteredInstructionOptions: Word[];
-
+  
+  currentInstruction: string;
 
   constructor(public ideService: IdeService) {
     // pano natin pagkakasyahin 1024 slots sa UI? lol
@@ -72,6 +73,7 @@ export class MemoryTableComponent implements OnInit {
         that.instructions = [];
         that.instructions = newInstructions;
         that.filteredInstructionOptions = this.instructions;
+        that.highlightCurrentInstruction();
 
       });
     
@@ -87,7 +89,6 @@ export class MemoryTableComponent implements OnInit {
         that.data = [];
         that.data = newData;
         that.filteredDataOptions = this.data;
-
       });
     
      // taga salo ng ide settings, pang divide ng tables
@@ -101,6 +102,18 @@ export class MemoryTableComponent implements OnInit {
        that.ideSettings = newData;
      });
     
+     // taga salo ng currently running instruction
+     this.ideService.state$
+     .pipe(
+       map(state => state.currentInstructionAddress),
+       filter(data => data != null),
+       distinctUntilChanged()
+     )
+       .subscribe(newInstructionAddress => {
+         that.currentInstruction = newInstructionAddress.toString();
+         that.highlightCurrentInstruction();   
+     });
+    
      // handle filters
     this.myDataControl.valueChanges.subscribe(newValue => {
       this.filteredDataOptions = this._filter(this.data, newValue);
@@ -110,7 +123,25 @@ export class MemoryTableComponent implements OnInit {
       this.filteredInstructionOptions = this._filter(this.instructions, newValue);
     });
 
+    
   }
+
+  private highlightCurrentInstruction(): void{
+
+    if (this.filteredInstructionOptions)
+    {
+      this.filteredInstructionOptions.forEach(item => {
+        if (item.decimalAddress == this.currentInstruction) {
+          item.color = '#edf8b1';
+        }
+        else {
+          item.color = 'none';
+        }
+      });
+    }
+   
+  }
+  
 
   private _filter(collection: Word[], value: string): Word[] {
     const filterValue = value.toUpperCase();
