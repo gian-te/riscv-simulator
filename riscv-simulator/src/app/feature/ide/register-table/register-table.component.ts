@@ -16,7 +16,7 @@ export class RegisterTableComponent implements OnInit {
   memory: any; // dictionary siguro. key value pair
   counter: number = 0;
 
-  listOfSupportedRegisters: any = {};
+  listOfSupportedRegisters: any = null;
   constructor(private ideService: IdeService) {
 
 

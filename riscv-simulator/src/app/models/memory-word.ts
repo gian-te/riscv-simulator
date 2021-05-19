@@ -3,7 +3,7 @@ export interface Word {
   color?: string; // aesthetic purposes
   hexAddress: string;
   decimalAddress: string;
-  value: string;
+  value: any;
   colSpan?: "1";
   rowSpan?: "1";
   memoryBlock?: string;

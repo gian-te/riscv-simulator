@@ -204,7 +204,8 @@ export class IdeService extends Store<IdeState> {
     'X28':'00000000',
     'X29':'00000000',
     'X30':'00000000',
-    'X31':'00000000'};
+    'X31': '00000000'
+    };
 
   constructor() {
     super(new IdeState());
@@ -461,6 +462,7 @@ export class IdeService extends Store<IdeState> {
   // Sasalohin ni memory table (data)
   public updateData(data): void {
     let newData: Word[] = [];
+    let newSymbols: Word[] = [];
     let addressOfNextInstruction = 0; // 0x0000 daw ung start sabi ni sir eh
     for (let i = 0; i < data.length; i++) {
       let j = addressOfNextInstruction;
@@ -474,12 +476,15 @@ export class IdeService extends Store<IdeState> {
       let item: any = data[i];
       if (item.type == '.byte') {
         j = addressOfNextInstruction + 1;
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2,0); 
       }
       if (item.type == '.half') {
         j = addressOfNextInstruction + 2;
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4,0); 
       }
       if (item.type == '.word') {
         j = addressOfNextInstruction + 4;
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8,0); 
       }
 
       /*
@@ -492,16 +497,39 @@ export class IdeService extends Store<IdeState> {
       ...
       2047 =
       */
-      let word: Word =
+      
+      // 0x01234567
+      let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
+      let littleEndianStart = hexValue.length - 1;
+      for (let k = littleEndianStart; k > 0; k-=2 )
+      {
+        // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex values na ipapasok sa memory slot.
+        let byte = hexValue.substr(k - 1, 2);
+        let dataWord: Word =
+        {
+          decimalAddress: addressOfNextInstruction.toString(),
+          hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
+          value: {
+            name: data[i].name,
+            type: data[i].type,
+            value: byte
+          },
+          memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+        }
+        newData.push(dataWord);
+        addressOfNextInstruction++;
+      }
+
+      let symbol: Word =
       {
         decimalAddress: addressOfNextInstruction.toString(),
         hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
         value: data[i],
         memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
       }
+      newSymbols.push(symbol);
       addressOfNextInstruction = j;
 
-      newData.push(word);
     }
 
     this.setState({
@@ -511,7 +539,7 @@ export class IdeService extends Store<IdeState> {
 
     this.setState({
       ...this.state,
-      symbols: newData,
+      symbols: newSymbols,
     });
   }
 
