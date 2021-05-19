@@ -463,9 +463,11 @@ export class IdeService extends Store<IdeState> {
   public updateData(data): void {
     let newData: Word[] = [];
     let newSymbols: Word[] = [];
-    let addressOfNextInstruction = 0; // 0x0000 daw ung start sabi ni sir eh
+    let addressOfNextWord = 0; // 0x0000 daw ung start sabi ni sir eh
+    let currentCountOfWordsInBlock = 0;
+
     for (let i = 0; i < data.length; i++) {
-      let j = addressOfNextInstruction;
+      let j = addressOfNextWord;
       //if (i != 0) {
 
       // try to simulate +4 hex (tama ba to?)
@@ -475,15 +477,15 @@ export class IdeService extends Store<IdeState> {
 
       let item: any = data[i];
       if (item.type == '.byte') {
-        j = addressOfNextInstruction + 1;
+        j = addressOfNextWord + 1;
         data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2,0); 
       }
       if (item.type == '.half') {
-        j = addressOfNextInstruction + 2;
+        j = addressOfNextWord + 2;
         data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4,0); 
       }
       if (item.type == '.word') {
-        j = addressOfNextInstruction + 4;
+        j = addressOfNextWord + 4;
         data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8,0); 
       }
 
@@ -497,39 +499,83 @@ export class IdeService extends Store<IdeState> {
       ...
       2047 =
       */
-      
+      let addressOfThisInstruction = addressOfNextWord;
+      // if wordCounter + numberOfWords in data[i].value exceeds 4, fill block with zero and assign the variable to the next block
+      let assignToNextBlock = ((currentCountOfWordsInBlock + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) % Number(this.state.ideSettings.cacheBlockSize)) == 0 ; // wtf this condition
       // 0x01234567
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
-      for (let k = littleEndianStart; k > 0; k-=2 )
+      let specialCaseByteHalf = item.type == '.half' &&  (currentCountOfWordsInBlock  % Number(this.state.ideSettings.cacheBlockSize) == 1 && i > 0 && data[i - 1].type == '.byte')
+      // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next block
+      if (assignToNextBlock)
       {
-        // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex values na ipapasok sa memory slot.
-        let byte = hexValue.substr(k - 1, 2);
+        i--;
         let dataWord: Word =
         {
-          decimalAddress: addressOfNextInstruction.toString(),
-          hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
+          decimalAddress: addressOfNextWord.toString(),
+          hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
           value: {
             name: data[i].name,
             type: data[i].type,
-            value: byte
+            value: '00'
           },
           memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
         }
         newData.push(dataWord);
-        addressOfNextInstruction++;
+        addressOfNextWord++;
+        currentCountOfWordsInBlock++;
+        continue;
       }
-
-      let symbol: Word =
+      // else if (specialCaseByteHalf)
+      // {
+      //   i--;
+      //   let dataWord: Word =
+      //   {
+      //     decimalAddress: addressOfNextWord.toString(),
+      //     hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
+      //     value: {
+      //       name: data[i].name,
+      //       type: data[i].type,
+      //       value: '00'
+      //     },
+      //     memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+      //   }
+      //   newData.push(dataWord);
+      //   addressOfNextWord++;
+      //   currentCountOfWordsInBlock++;
+      // }
+      else
       {
-        decimalAddress: addressOfNextInstruction.toString(),
-        hexAddress: this.convertStringToHex(addressOfNextInstruction.toString()),
-        value: data[i],
-        memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-      }
-      newSymbols.push(symbol);
-      addressOfNextInstruction = j;
 
+        for (let k = littleEndianStart; k > 0; k-=2 )
+        {
+          // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex characters na ipapasok sa isang memory slot.
+          let word = hexValue.substr(k - 1, 2);
+          let dataWord: Word =
+          {
+            decimalAddress: addressOfNextWord.toString(),
+            hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
+            value: {
+              name: data[i].name,
+              type: data[i].type,
+              value: word
+            },
+            memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+          }
+          newData.push(dataWord);
+          addressOfNextWord++;
+          currentCountOfWordsInBlock++;
+        }
+        let symbol: Word =
+        {
+          decimalAddress: addressOfThisInstruction.toString(),
+          hexAddress: this.convertStringToHex(addressOfThisInstruction.toString()),
+          value: data[i],
+          memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+        }
+        newSymbols.push(symbol);
+        addressOfNextWord = j;
+      }
     }
 
     this.setState({
