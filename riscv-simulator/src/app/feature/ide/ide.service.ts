@@ -501,7 +501,9 @@ export class IdeService extends Store<IdeState> {
       */
       let addressOfThisInstruction = addressOfNextWord;
       // if wordCounter + numberOfWords in data[i].value exceeds 4, fill block with zero and assign the variable to the next block
-      let assignToNextBlock = ((currentCountOfWordsInBlock + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) % Number(this.state.ideSettings.cacheBlockSize)) == 0 ; // wtf this condition
+      // current number of words in block + words dun sa current instruction na pina process % cache block size
+      let modulo = currentCountOfWordsInBlock % Number(this.state.ideSettings.cacheBlockSize);
+      let assignToNextBlock = ( modulo > 0 && (modulo  + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) >  Number(this.state.ideSettings.cacheBlockSize)) ; // wtf this condition
       // 0x01234567
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
