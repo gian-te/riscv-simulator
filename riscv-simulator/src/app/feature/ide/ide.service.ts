@@ -30,7 +30,7 @@ export class IdeState {
   };
   data: string[];
   isAssembling: boolean = false;
-  registers: any = {};
+  registers: any;
   ideSettings: IdeSettings;
   currentInstructionAddress: number = 4096;
   codeLines: { token: string; type: string }[][];
@@ -48,11 +48,13 @@ export class IdeService extends Store<IdeState> {
   sendAssembleEvent() {
     // reset counter on assemble
     this.state.currentInstructionAddress = 4096;
+    this.initialize();
 
     this.assembleSubject.next();
   }
 
   assemble(): Observable<any> {
+
     return this.assembleSubject.asObservable();
   }
 
@@ -201,10 +203,11 @@ export class IdeService extends Store<IdeState> {
       'X30': '00000000',
       'X31': '00000000'
     };
+  Data_Default_Values = Array(2048).fill('00');
 
   constructor() {
     super(new IdeState());
-    this.initialize();
+
   }
 
   // TODO: Tanggalin na lang pag ready na
@@ -224,8 +227,8 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
-      registers: { ...this.Register_Default_Values },
-      data: Array(2048).fill('00')
+      registers: this.Register_Default_Values,
+      data: this.Data_Default_Values
     })
 
     // TODO: Tanggalin na lang pag ready na
@@ -658,7 +661,6 @@ export class IdeService extends Store<IdeState> {
   }
 
   public updateCode(newCode) {
-    this.initialize();
 
     console.log('setting code to: ' + newCode);
 

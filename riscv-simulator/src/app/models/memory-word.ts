@@ -1,6 +1,6 @@
 // represents a 32-bitword in the memory
 export interface Word {
-  color?: string; // aesthetic purposes
+  
   hexAddress: string;
   decimalAddress: string;
   value: any;
@@ -26,5 +26,13 @@ export interface InstructionModel{
     type: string;
   }[],
   memoryBlock: string,
-  lineOfCode?: string
+  lineOfCode?: string,
+  color?: string; // aesthetic purposes
+}
+
+export interface DataModel{
+  decimalAddress: string,
+  hexAddress: string,
+  value: string,
+  memoryBlock: string,
 }

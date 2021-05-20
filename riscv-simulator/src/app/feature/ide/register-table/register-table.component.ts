@@ -11,21 +11,15 @@ import { Word } from '../../../models/memory-word'
   styleUrls: ['./register-table.component.css']
 })
 export class RegisterTableComponent implements OnInit {
-  instructions: Word[];
-  data: Word[]
-  memory: any; // dictionary siguro. key value pair
-  counter: number = 0;
 
-  listOfSupportedRegisters: any = null;
+  listOfSupportedRegisters: any;
   constructor(private ideService: IdeService) {
-
 
   }
 
   ngOnInit() {
-    this.memory = {};
-    
-    this.ideService.initialize();
+
+    this.listOfSupportedRegisters = this.ideService.Register_Default_Values;
   }
   
   ngAfterViewInit() {
@@ -41,7 +35,5 @@ export class RegisterTableComponent implements OnInit {
       .subscribe(updatedRegisters => {
         that.listOfSupportedRegisters = updatedRegisters;
       });
-    
-    
   }
 }

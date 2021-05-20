@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
-import { Word } from '../../../models/memory-word'
+import { InstructionModel, Word } from '../../../models/memory-word'
 import { IdeSettings } from 'src/app/models/ide-settings';
 // needed for search bar
 import { FormControl } from '@angular/forms';
@@ -15,8 +15,8 @@ import { Observable } from 'rxjs';
   styleUrls: ['./memory-table.component.css']
 })
 export class MemoryTableComponent implements OnInit {
-  instructions: Word[];
-  data: string[]
+  instructions: InstructionModel[];
+  data: string[];
   memory: any; // dictionary siguro. key value pair
   counter: number = 0;
   ideSettings: IdeSettings = 
@@ -29,34 +29,17 @@ export class MemoryTableComponent implements OnInit {
   myInstructionControl = new FormControl();
   
   filteredDataOptions: string[];
-  filteredInstructionOptions: Word[];
+  filteredInstructionOptions: InstructionModel[];
   
   currentInstruction: string;
 
   constructor(public ideService: IdeService) {
-    // pano natin pagkakasyahin 1024 slots sa UI? lol
-    // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
-    this.instructions = [
-      // {
-      //   address: "1000",
-      //   value: "0x00000000",
-      //   //color: 'lightblue'
-      // }
-    ];
-
-    this.data = [
-      // {
-      //   address: "0000",
-      //   value: "0x00000000",
-      //   //color: 'lightblue'
-      // }
-    ];
-
 
   }
 
   ngOnInit() {
-    this.memory = { };
+    this.memory = {};
+    
   }
   
   ngAfterViewInit() {
@@ -128,9 +111,9 @@ export class MemoryTableComponent implements OnInit {
 
   private highlightCurrentInstruction(): void{
 
-    if (this.filteredInstructionOptions)
+    if (this.instructions)
     {
-      this.filteredInstructionOptions.forEach(item => {
+      this.instructions.forEach(item => {
         if (item.decimalAddress == this.currentInstruction) {
           item.color = '#edf8b1';
         }
@@ -140,12 +123,14 @@ export class MemoryTableComponent implements OnInit {
       });
     }
    
+    this.filteredInstructionOptions = this.instructions;
   }
   
   private _filterData(collection: string[], value: string): string[] {
     const filterValue = value.toUpperCase();
+    if (!value) return collection;
     let retVal: string[] = [];
-    for (let i = 0; i > collection.length; i++)
+    for (let i = 0; i < collection.length; i++)
     {
       let address = this.ideService.dec2hex(i, 4);
       if (address.toUpperCase() == filterValue)
@@ -157,7 +142,7 @@ export class MemoryTableComponent implements OnInit {
     return retVal;
   }
 
-  private _filterInstructions(collection: Word[], value: string): Word[] {
+  private _filterInstructions(collection: InstructionModel[], value: string): InstructionModel[] {
     const filterValue = value.toUpperCase();
 
     return collection.filter(option => option.hexAddress.toUpperCase().includes(filterValue));

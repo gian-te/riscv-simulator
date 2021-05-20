@@ -12,9 +12,9 @@
                  [formControl]="myDataControl"
                  [matAutocomplete]="autoData">
           <mat-autocomplete #autoData="matAutocomplete">
-            <!-- <mat-option *ngFor="let word of data" [value]="word.hexAddress">
-              {{word.hexAddress.padStart(4,0)}}
-            </mat-option> -->
+            <mat-option *ngFor="let word of data; let i = index;" [value]="ideService.dec2hex(i).toString().padStart(4,0)">
+              {{ ideService.dec2hex(i).toString().padStart(4,0)}}
+            </mat-option>
           </mat-autocomplete>
         </mat-form-field>
       </form>
@@ -54,10 +54,10 @@
                  [formControl]="myInstructionControl"
                  [matAutocomplete]="autoInstructions">
           <mat-autocomplete #autoInstructions="matAutocomplete">
-            <!-- <mat-option *ngFor="let word of instructions" [value]="word.hexAddress">
-              {{word.hexAddress.padStart(4,0)}}
+            <mat-option *ngFor="let instr of instructions" [value]="instr.hexAddress">
+              {{instr.hexAddress.padStart(4,0)}}
              
-            </mat-option> -->
+            </mat-option>
           </mat-autocomplete>
         </mat-form-field>
       </form>
@@ -69,19 +69,19 @@
         <td style="background-color: darkseagreen;"> <span> Line of Code</span></td>
     
       </tr>
-      <tr *ngFor="let word of filteredInstructionOptions"  [ngStyle]="{'background': word.color }">
+      <tr *ngFor="let instr of filteredInstructionOptions"  [ngStyle]="{'background': instr.color }">
         <td>
-          <span><b> {{ word.hexAddress}}</b></span>
+          <span><b> {{ instr.hexAddress}}</b></span>
         </td>
         <!-- REPLACE WITH ACTUAL LINE OF CODE -->
         <!-- <td>
           <span><b> {{ word.memoryBlock}}</b></span>
         </td> -->
         <td>
-          <span><b> {{'0x' +ideService.convertBinaryToHex(word.value).padStart(8, 0) }}</b></span>
+          <span><b> {{'0x' +ideService.convertBinaryToHex(instr.value).padStart(8, 0) }}</b></span>
         </td>
         <td>
-          <span><b> {{ word.lineOfCode }}</b></span>
+          <span><b> {{ instr.lineOfCode }}</b></span>
         </td>
       </tr>
     </table>
