@@ -235,7 +235,8 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
-      registers: { ...this.Register_Default_Values }
+      registers: { ...this.Register_Default_Values },
+      data: Array(512).fill('00')
     })
 
     // TODO: Tanggalin na lang pag ready na
@@ -266,10 +267,13 @@ export class IdeService extends Store<IdeState> {
         this.slti(currentInstruction);
         break;
       case 'SB':
+        this.sb(currentInstruction);
         break;
       case 'SH':
+        this.sh(currentInstruction);
         break;
       case 'SW':
+        this.sw(currentInstruction);
         break;
       case 'LB':
         this.lb(currentInstruction);
@@ -360,7 +364,8 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    let byteHex = this.state.data[effectiveAddress % 4].value.value
+    // let byteHex = this.state.data[effectiveAddress].value.value
+    let byteHex = this.state.data[effectiveAddress]
     let byteBinary = this.hex2bin(byteHex, 8)
     const signBit = byteBinary.slice(0, 1)
 
@@ -376,8 +381,10 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    const lowerByteHex = this.state.data[effectiveAddress % 4].value.value
-    const upperByteHex = this.state.data[(effectiveAddress % 4) + 1].value.value
+    // const lowerByteHex = this.state.data[effectiveAddress].value.value
+    // const upperByteHex = this.state.data[effectiveAddress + 1].value.value
+    const lowerByteHex = this.state.data[effectiveAddress]
+    const upperByteHex = this.state.data[effectiveAddress + 1]
     const halfBinary = this.hex2bin(`${upperByteHex}${lowerByteHex}`, 16)
     const signBit = halfBinary.slice(0, 1)
 
@@ -393,14 +400,81 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    const byte1Hex = this.state.data[effectiveAddress % 4].value.value
-    const byte2Hex = this.state.data[(effectiveAddress % 4) + 1].value.value
-    const byte3Hex = this.state.data[(effectiveAddress % 4) + 2].value.value
-    const byte4Hex = this.state.data[(effectiveAddress % 4) + 3].value.value
+    // const byte1Hex = this.state.data[effectiveAddress].value.value
+    // const byte2Hex = this.state.data[effectiveAddress + 1].value.value
+    // const byte3Hex = this.state.data[effectiveAddress + 2].value.value
+    // const byte4Hex = this.state.data[effectiveAddress + 3].value.value
+    const byte1Hex = this.state.data[effectiveAddress]
+    const byte2Hex = this.state.data[effectiveAddress + 1]
+    const byte3Hex = this.state.data[effectiveAddress + 2]
+    const byte4Hex = this.state.data[effectiveAddress + 3]
     const wordHex = `${byte4Hex}${byte3Hex}${byte2Hex}${byte1Hex}`.toUpperCase();
 
     this.state.registers[rd] = wordHex;
     console.log(this.state.registers)
+  }
+
+  private sb(instruction) {
+    const rs2 = instruction[1].token;
+    const indexOpeningBracket = instruction[2].token.indexOf('(')
+    const indexClosingBracket = instruction[2].token.indexOf(')')
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
+    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+
+    const wordHex = this.state.registers[rs2]
+    const byteHex = wordHex.slice(6, 8)
+
+    // this.state.data[effectiveAddress].value.value = byteHex
+    this.state.data[effectiveAddress] = byteHex
+
+    console.log(this.state.data)
+  }
+
+  private sh(instruction) {
+    const rs2 = instruction[1].token;
+    const indexOpeningBracket = instruction[2].token.indexOf('(')
+    const indexClosingBracket = instruction[2].token.indexOf(')')
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
+    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+
+    const wordHex = this.state.registers[rs2]
+    const byte1Hex = wordHex.slice(6, 8)
+    const byte2Hex = wordHex.slice(4, 6)
+
+    // this.state.data[effectiveAddress].value.value = byte1Hex
+    // this.state.data[effectiveAddress + 1].value.value = byte2Hex
+    this.state.data[effectiveAddress] = byte1Hex
+    this.state.data[effectiveAddress + 1] = byte2Hex
+
+    console.log(this.state.data)
+  }
+
+  private sw(instruction) {
+    const rs2 = instruction[1].token;
+    const indexOpeningBracket = instruction[2].token.indexOf('(')
+    const indexClosingBracket = instruction[2].token.indexOf(')')
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
+    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+
+    const wordHex = this.state.registers[rs2]
+    const byte1Hex = wordHex.slice(6, 8)
+    const byte2Hex = wordHex.slice(4, 6)
+    const byte3Hex = wordHex.slice(2, 4)
+    const byte4Hex = wordHex.slice(0, 2)
+
+    // this.state.data[effectiveAddress].value.value = byte1Hex
+    // this.state.data[effectiveAddress + 1].value.value = byte2Hex
+    // this.state.data[effectiveAddress + 2].value.value = byte3Hex
+    // this.state.data[effectiveAddress + 3].value.value = byte4Hex
+    this.state.data[effectiveAddress] = byte1Hex
+    this.state.data[effectiveAddress + 1] = byte2Hex
+    this.state.data[effectiveAddress + 2] = byte3Hex
+    this.state.data[effectiveAddress + 3] = byte4Hex
+
+    console.log(this.state.data)
   }
 
   public runAll(): void {
