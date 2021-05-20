@@ -26,9 +26,9 @@ export class TextEditorComponent implements OnInit {
   .text
   main:
     addi x5, x0, 0
-    addi x6, x0, 1
+    addi x6, x0, 2
     lw x10, 0(x5)
-    lb x11, 0(x6)
+    sh x10, 0(x6)
     add x12, x10, x11
   `
 
