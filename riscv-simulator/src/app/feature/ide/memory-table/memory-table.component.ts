@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
-import { InstructionModel, Word } from '../../../models/memory-word'
+import { InstructionModel, DataModel } from '../../../models/memory-word'
 import { IdeSettings } from 'src/app/models/ide-settings';
 // needed for search bar
 import { FormControl } from '@angular/forms';
@@ -16,7 +16,7 @@ import { Observable } from 'rxjs';
 })
 export class MemoryTableComponent implements OnInit {
   instructions: InstructionModel[];
-  data: string[];
+  data: DataModel[];
   memory: any; // dictionary siguro. key value pair
   counter: number = 0;
   ideSettings: IdeSettings = 
@@ -28,7 +28,7 @@ export class MemoryTableComponent implements OnInit {
   myDataControl = new FormControl();
   myInstructionControl = new FormControl();
   
-  filteredDataOptions: string[];
+  filteredDataOptions: DataModel[];
   filteredInstructionOptions: InstructionModel[];
   
   currentInstruction: string;
@@ -70,7 +70,16 @@ export class MemoryTableComponent implements OnInit {
       .subscribe(newData => {
         that.filteredDataOptions = [];
         that.data = [];
-        that.data = newData;
+        newData.map(function (elem, index){
+          that.data.push(
+            {
+              decimalAddress: index.toString(),
+              hexAddress: that.ideService.dec2hex(index, 4).toString(),
+              value: elem,
+              memoryBlock: that.getBlockNumber(index).toString()
+            }
+          );
+        });
         that.filteredDataOptions = this.data;
       });
     
@@ -126,20 +135,11 @@ export class MemoryTableComponent implements OnInit {
     this.filteredInstructionOptions = this.instructions;
   }
   
-  private _filterData(collection: string[], value: string): string[] {
+  private _filterData(collection: DataModel[], value: string): DataModel[] {
     const filterValue = value.toUpperCase();
-    if (!value) return collection;
-    let retVal: string[] = [];
-    for (let i = 0; i < collection.length; i++)
-    {
-      let address = this.ideService.dec2hex(i, 4);
-      if (address.toUpperCase() == filterValue)
-      {
-        retVal.push(collection[i]);
-      }
-    }
-
-    return retVal;
+    
+    
+    return collection.filter(option => option.hexAddress.toUpperCase().includes(filterValue));
   }
 
   private _filterInstructions(collection: InstructionModel[], value: string): InstructionModel[] {

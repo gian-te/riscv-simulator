@@ -227,8 +227,8 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
-      registers: this.Register_Default_Values,
-      data: this.Data_Default_Values
+      registers: { ...this.Register_Default_Values },
+      //data: this.Data_Default_Values
     })
 
     // TODO: Tanggalin na lang pag ready na

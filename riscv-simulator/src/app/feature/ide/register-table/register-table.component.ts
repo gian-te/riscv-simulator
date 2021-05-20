@@ -24,7 +24,6 @@ export class RegisterTableComponent implements OnInit {
   
   ngAfterViewInit() {
 
-    const that = this;
     // dito sasaluhin natin yung changes sa registers, habang nag rurun yung code mag seset state yung runner natin pag may changes sa values ng registers
     this.ideService.state$
       .pipe(
@@ -33,7 +32,8 @@ export class RegisterTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(updatedRegisters => {
-        that.listOfSupportedRegisters = updatedRegisters;
+        console.log('list of registers updated');
+        this.listOfSupportedRegisters = updatedRegisters;
       });
   }
 }

@@ -12,8 +12,8 @@
                  [formControl]="myDataControl"
                  [matAutocomplete]="autoData">
           <mat-autocomplete #autoData="matAutocomplete">
-            <mat-option *ngFor="let word of data; let i = index;" [value]="ideService.dec2hex(i).toString().padStart(4,0)">
-              {{ ideService.dec2hex(i).toString().padStart(4,0)}}
+            <mat-option *ngFor="let word of data" [value]="word.hexAddress">
+              {{ word.hexAddress }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -26,15 +26,15 @@
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of filteredDataOptions; let i = index;">
+      <tr *ngFor="let data of filteredDataOptions">
         <td>
-          <span><b>{{ ideService.dec2hex(i, 4) }}</b></span>
+          <span><b>{{ data.hexAddress }}</b></span>
         </td>
         <td>
-          <span><b> {{ getBlockNumber(i) }}</b></span>
+          <span><b> {{ data.memoryBlock }}</b></span>
         </td>
         <td>
-          <span><b>{{'0x' + filteredDataOptions[i] }}</b></span>
+          <span><b>{{'0x' + data.value }}</b></span>
         </td> 
       </tr>
     </table>
