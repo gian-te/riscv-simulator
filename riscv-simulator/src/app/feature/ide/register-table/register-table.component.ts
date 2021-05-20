@@ -25,7 +25,7 @@ export class RegisterTableComponent implements OnInit {
   ngOnInit() {
     this.memory = {};
     
-    this.ideService.resetRegisters();
+    this.ideService.initialize();
   }
   
   ngAfterViewInit() {

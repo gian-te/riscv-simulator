@@ -79,7 +79,7 @@ export class CacheTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(newData => {
-        that.data = newData;
+        //that.data = newData;
       });
     
      // taga salo ng ide settings, pang divide ng tables

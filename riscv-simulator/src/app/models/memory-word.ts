@@ -8,3 +8,23 @@ export interface Word {
   rowSpan?: "1";
   memoryBlock?: string;
 }
+
+export interface SymbolModel {
+  hexAddress: string;
+  decimalAddress: string;
+  value: any;
+}
+
+
+export interface InstructionModel{
+  address: string,
+  decimalAddress: string,
+  hexAddress: string,
+  value: string,
+  basic: {
+    token: string;
+    type: string;
+  }[],
+  memoryBlock: string,
+  lineOfCode?: string
+}

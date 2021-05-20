@@ -22,6 +22,19 @@ export class TextEditorComponent implements OnInit {
     var1: .byte 0x88
     var2: .byte 0x99
     var3: .half 0xBBAA
+    var4: .word 0x234567
+    var5: .word 0x01234567
+    var6: .word 0x01234567
+    var7: .word 0x01234567
+    var8: .word 0x01234567
+    var9: .word 0x01234567
+    var10: .word 0x01234567
+    var12: .word 0x01234567
+    var13: .word 0x01234567
+    var14: .word 0x01234567
+    var15: .word 0x01234567
+    var16: .word 0x01234567
+
 
   .text
   main:

@@ -2,35 +2,23 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject, UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
-import { Word } from 'src/app/models/memory-word';
+import { Word , SymbolModel, InstructionModel} from 'src/app/models/memory-word';
 
 import { Store } from '../../core/state-management/state-management';
-
-type TInstruction = {
-  address: string,
-  decimalAddress: string,
-  hexAddress: string,
-  value: string,
-  basic: {
-    token: string;
-    type: string;
-  }[],
-  memoryBlock: string;
-}
 
 // components will subscribe here
 
 export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
-  symbols: Word[]; // most likely a dictionary
+  symbols: SymbolModel[]; // most likely a dictionary
   symbolByName: {
     [name: string]: {
       type: string;
       address: string;
     }
   };
-  instructions: TInstruction[]; // most likely an array of opcodes
+  instructions: InstructionModel[]; // most likely an array of opcodes
   instructionByAddress: {
     [address: string]: {
       value: string;
@@ -40,7 +28,7 @@ export class IdeState {
       }[]
     }
   };
-  data: Word[];
+  data: string[];
   isAssembling: boolean = false;
   registers: any = {};
   ideSettings: IdeSettings;
@@ -49,6 +37,7 @@ export class IdeState {
   registerList: string[];
   dataSegmentList: string[];
   dataSegmentPointer: number = 0;
+  cache: any;
 }
 
 
@@ -215,7 +204,7 @@ export class IdeService extends Store<IdeState> {
 
   constructor() {
     super(new IdeState());
-    this.resetRegisters();
+    this.initialize();
   }
 
   // TODO: Tanggalin na lang pag ready na
@@ -230,13 +219,13 @@ export class IdeService extends Store<IdeState> {
     this.state.registerList[11] = '00000004'
   }
 
-  public resetRegisters(): void {
+  public initialize(): void {
     this.setState({
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
       registers: { ...this.Register_Default_Values },
-      data: Array(512).fill('00')
+      data: Array(2048).fill('00')
     })
 
     // TODO: Tanggalin na lang pag ready na
@@ -489,7 +478,7 @@ export class IdeService extends Store<IdeState> {
   }
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
-    let newInstructions: TInstruction[] = [];
+    let newInstructions: InstructionModel[] = [];
     for (let i = 0; i < inst.length; i++) {
       let j = i + 4096; // 0x1000 daw ung start sabi ni sir eh
       if (j != 4096) { j += 3 * i; }
@@ -497,16 +486,19 @@ export class IdeService extends Store<IdeState> {
       // 1 word in the memory is 8 bits/1 byte.
       // 32 bits = 4 words. kaya +4 hex ng +4 hex kasi sure na 32 bits ung pinapasok dahil 32 bits ung opcode
 
-      let word: TInstruction =
+      let instr: InstructionModel =
       {
         address: j.toString(),
         value: inst[i],
         basic: this.state.codeLines[i],
         decimalAddress: j.toString(),
         hexAddress: this.convertStringToHex(j.toString()),
-        memoryBlock: (Math.floor((newInstructions.length + this.state.data.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+        memoryBlock: (Math.floor((newInstructions.length + this.state.data.length) / Number(this.state.ideSettings.cacheBlockSize))).toString(),
+        lineOfCode: this.state.codeLines[i].map(function(elem){
+                                                return elem.token;
+                                            }).join(",")
       }
-      newInstructions.push(word);
+      newInstructions.push(instr);
     }
 
     const normalizeInstruction = newInstructions.reduce((acc, cur) => {
@@ -529,8 +521,8 @@ export class IdeService extends Store<IdeState> {
 
   // Sasalohin ni memory table (data)
   public updateData(data): void {
-    let newData: Word[] = [];
-    let newSymbols: Word[] = [];
+    let newData: string[] = [];
+    let newSymbols: SymbolModel[] = [];
     let addressOfNextWord = 0; // 0x0000 daw ung start sabi ni sir eh
     let currentCountOfWordsInBlock = 0;
 
@@ -575,61 +567,43 @@ export class IdeService extends Store<IdeState> {
       // 0x01234567
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
-      let specialCaseByteHalf = item.type == '.half' && (currentCountOfWordsInBlock % Number(this.state.ideSettings.cacheBlockSize) == 1 && i > 0 && data[i - 1].type == '.byte')
+      
       // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next block
       if (assignToNextBlock) {
         i--;
-        let dataWord: Word =
-        {
-          decimalAddress: addressOfNextWord.toString(),
-          hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
-          value: {
-            name: data[i].name,
-            type: data[i].type,
-            value: '00'
-          },
-          memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-        }
-        newData.push(dataWord);
+        // let dataWord: Word =
+        // {
+        //   decimalAddress: addressOfNextWord.toString(),
+        //   hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
+        //   value: {
+        //     name: data[i].name,
+        //     type: data[i].type,
+        //     value: '00'
+        //   },
+        //   memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+        // }
+        newData.push('00');
         addressOfNextWord++;
         currentCountOfWordsInBlock++;
         continue;
       }
-      // else if (specialCaseByteHalf)
-      // {
-      //   i--;
-      //   let dataWord: Word =
-      //   {
-      //     decimalAddress: addressOfNextWord.toString(),
-      //     hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
-      //     value: {
-      //       name: data[i].name,
-      //       type: data[i].type,
-      //       value: '00'
-      //     },
-      //     memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-      //   }
-      //   newData.push(dataWord);
-      //   addressOfNextWord++;
-      //   currentCountOfWordsInBlock++;
-      // }
       else {
 
         for (let k = littleEndianStart; k > 0; k -= 2) {
           // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex characters na ipapasok sa isang memory slot.
           let word = hexValue.substr(k - 1, 2);
-          let dataWord: Word =
-          {
-            decimalAddress: addressOfNextWord.toString(),
-            hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
-            value: {
-              name: data[i].name,
-              type: data[i].type,
-              value: word
-            },
-            memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-          }
-          newData.push(dataWord);
+          // let dataWord: Word =
+          // {
+          //   decimalAddress: addressOfNextWord.toString(),
+          //   hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
+          //   value: {
+          //     name: data[i].name,
+          //     type: data[i].type,
+          //     value: word
+          //   },
+          //   memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+          // }
+          newData.push(word);
           addressOfNextWord++;
           currentCountOfWordsInBlock++;
         }
@@ -684,6 +658,8 @@ export class IdeService extends Store<IdeState> {
   }
 
   public updateCode(newCode) {
+    this.initialize();
+
     console.log('setting code to: ' + newCode);
 
     const codeList: string[] = newCode.replace(/(\t|\n)/g, " ").replace(/,/g, "").split(" ").filter(_ => !!_)
@@ -780,7 +756,6 @@ export class IdeService extends Store<IdeState> {
     }
 
     // reset registers on assemble
-    this.resetRegisters();
 
 
     // reset error flag for next Assemble
@@ -1158,11 +1133,11 @@ export class IdeService extends Store<IdeState> {
     return hex;
   }
 
-  private hex2bin(hex, n) {
+  public hex2bin(hex, n) {
     return ("0".repeat(n) + parseInt(hex, 16).toString(2)).substr(-n);
   }
 
-  private bin2hex(bin, sign, n) {
+  public bin2hex(bin, sign, n) {
     if (sign === '0') {
       return (sign.repeat(n * 4) + parseInt(bin, 2)).toString(16).substr(-n).toUpperCase();
     } else {
@@ -1170,11 +1145,11 @@ export class IdeService extends Store<IdeState> {
     }
   }
 
-  private dec2hex(dec, n) {
+  public dec2hex(dec, n) {
     return ("0".repeat(n) + (dec >>> 0).toString(16).toUpperCase()).substr(-n);
   }
 
-  private hex2dec(hex) {
+  public hex2dec(hex) {
     if (hex.length % 2 != 0) {
       hex = "0" + hex;
     }

@@ -16,7 +16,7 @@ import { Observable } from 'rxjs';
 })
 export class MemoryTableComponent implements OnInit {
   instructions: Word[];
-  data: Word[]
+  data: string[]
   memory: any; // dictionary siguro. key value pair
   counter: number = 0;
   ideSettings: IdeSettings = 
@@ -28,7 +28,7 @@ export class MemoryTableComponent implements OnInit {
   myDataControl = new FormControl();
   myInstructionControl = new FormControl();
   
-  filteredDataOptions: Word[];
+  filteredDataOptions: string[];
   filteredInstructionOptions: Word[];
   
   currentInstruction: string;
@@ -116,11 +116,11 @@ export class MemoryTableComponent implements OnInit {
     
      // handle filters
     this.myDataControl.valueChanges.subscribe(newValue => {
-      this.filteredDataOptions = this._filter(this.data, newValue);
+      this.filteredDataOptions = this._filterData(this.data, newValue);
     });
 
     this.myInstructionControl.valueChanges.subscribe(newValue => {
-      this.filteredInstructionOptions = this._filter(this.instructions, newValue);
+      this.filteredInstructionOptions = this._filterInstructions(this.instructions, newValue);
     });
 
     
@@ -142,14 +142,31 @@ export class MemoryTableComponent implements OnInit {
    
   }
   
+  private _filterData(collection: string[], value: string): string[] {
+    const filterValue = value.toUpperCase();
+    let retVal: string[] = [];
+    for (let i = 0; i > collection.length; i++)
+    {
+      let address = this.ideService.dec2hex(i, 4);
+      if (address.toUpperCase() == filterValue)
+      {
+        retVal.push(collection[i]);
+      }
+    }
 
-  private _filter(collection: Word[], value: string): Word[] {
+    return retVal;
+  }
+
+  private _filterInstructions(collection: Word[], value: string): Word[] {
     const filterValue = value.toUpperCase();
 
     return collection.filter(option => option.hexAddress.toUpperCase().includes(filterValue));
   }
   
-  
+  private getBlockNumber(i: number)
+  {
+    return Math.floor(i / (Number(this.ideSettings.cacheBlockSize) * 4));
+  }
 
   // populateMemoryDataSegment()
   // {

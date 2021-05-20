@@ -12,9 +12,9 @@
                  [formControl]="myDataControl"
                  [matAutocomplete]="autoData">
           <mat-autocomplete #autoData="matAutocomplete">
-            <mat-option *ngFor="let word of data" [value]="word.hexAddress">
+            <!-- <mat-option *ngFor="let word of data" [value]="word.hexAddress">
               {{word.hexAddress.padStart(4,0)}}
-            </mat-option>
+            </mat-option> -->
           </mat-autocomplete>
         </mat-form-field>
       </form>
@@ -26,15 +26,15 @@
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
     
       </tr>
-      <tr *ngFor="let word of filteredDataOptions">
+      <tr *ngFor="let word of filteredDataOptions; let i = index;">
         <td>
-          <span><b>{{word.hexAddress.padStart(4,0) }}</b></span>
+          <span><b>{{ ideService.dec2hex(i, 4) }}</b></span>
         </td>
         <td>
-          <span><b> {{ word.memoryBlock}}</b></span>
+          <span><b> {{ getBlockNumber(i) }}</b></span>
         </td>
         <td>
-          <span><b>{{'0x' + word.value.value }}</b></span>
+          <span><b>{{'0x' + filteredDataOptions[i] }}</b></span>
         </td> 
       </tr>
     </table>
@@ -54,10 +54,10 @@
                  [formControl]="myInstructionControl"
                  [matAutocomplete]="autoInstructions">
           <mat-autocomplete #autoInstructions="matAutocomplete">
-            <mat-option *ngFor="let word of instructions" [value]="word.hexAddress">
+            <!-- <mat-option *ngFor="let word of instructions" [value]="word.hexAddress">
               {{word.hexAddress.padStart(4,0)}}
              
-            </mat-option>
+            </mat-option> -->
           </mat-autocomplete>
         </mat-form-field>
       </form>
@@ -65,19 +65,23 @@
     <table style="border-collapse:collapse;" border="1px solid">
       <tr>
         <td style="background-color: darkseagreen;"> <span> Address (Hex)</span></td>
-        <td style="background-color: darkseagreen;"> <span> Memory Block</span></td>
         <td style="background-color: darkseagreen;"> <span> Value</span></td>
+        <td style="background-color: darkseagreen;"> <span> Line of Code</span></td>
     
       </tr>
       <tr *ngFor="let word of filteredInstructionOptions"  [ngStyle]="{'background': word.color }">
         <td>
           <span><b> {{ word.hexAddress}}</b></span>
         </td>
-        <td>
+        <!-- REPLACE WITH ACTUAL LINE OF CODE -->
+        <!-- <td>
           <span><b> {{ word.memoryBlock}}</b></span>
-        </td>
+        </td> -->
         <td>
           <span><b> {{'0x' +ideService.convertBinaryToHex(word.value).padStart(8, 0) }}</b></span>
+        </td>
+        <td>
+          <span><b> {{ word.lineOfCode }}</b></span>
         </td>
       </tr>
     </table>
