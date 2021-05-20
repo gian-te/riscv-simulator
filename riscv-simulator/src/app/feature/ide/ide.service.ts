@@ -24,6 +24,12 @@ export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
   symbols: Word[]; // most likely a dictionary
+  symbolByName: {
+    [name: string]: {
+      type: string;
+      address: string;
+    }
+  };
   instructions: TInstruction[]; // most likely an array of opcodes
   instructionByAddress: {
     [address: string]: {
@@ -171,40 +177,40 @@ export class IdeService extends Store<IdeState> {
     'X30': '11110',
     'X31': '11111',
   };
-  Register_Default_Values = 
-  {
-    'X0':'00000000',
-    'X1':'00000000',
-    'X2':'00000000',
-    'X3':'00000000',
-    'X4':'00000000',
-    'X5':'00000000',
-    'X6':'00000000',
-    'X7':'00000000',
-    'X8':'00000000',
-    'X9':'00000000',
-    'X10':'00000000',
-    'X11':'00000000',
-    'X12':'00000000',
-    'X13':'00000000',
-    'X14':'00000000',
-    'X15':'00000000',
-    'X16':'00000000',
-    'X17':'00000000',
-    'X18':'00000000',
-    'X19':'00000000',
-    'X20':'00000000',
-    'X21':'00000000',
-    'X22':'00000000',
-    'X23':'00000000',
-    'X24':'00000000',
-    'X25':'00000000',
-    'X26':'00000000',
-    'X27':'00000000',
-    'X28':'00000000',
-    'X29':'00000000',
-    'X30':'00000000',
-    'X31': '00000000'
+  Register_Default_Values =
+    {
+      'X0': '00000000',
+      'X1': '00000000',
+      'X2': '00000000',
+      'X3': '00000000',
+      'X4': '00000000',
+      'X5': '00000000',
+      'X6': '00000000',
+      'X7': '00000000',
+      'X8': '00000000',
+      'X9': '00000000',
+      'X10': '00000000',
+      'X11': '00000000',
+      'X12': '00000000',
+      'X13': '00000000',
+      'X14': '00000000',
+      'X15': '00000000',
+      'X16': '00000000',
+      'X17': '00000000',
+      'X18': '00000000',
+      'X19': '00000000',
+      'X20': '00000000',
+      'X21': '00000000',
+      'X22': '00000000',
+      'X23': '00000000',
+      'X24': '00000000',
+      'X25': '00000000',
+      'X26': '00000000',
+      'X27': '00000000',
+      'X28': '00000000',
+      'X29': '00000000',
+      'X30': '00000000',
+      'X31': '00000000'
     };
 
   constructor() {
@@ -214,17 +220,17 @@ export class IdeService extends Store<IdeState> {
 
   // TODO: Tanggalin na lang pag ready na
   mockRegisterValues() {
-        /** mock data */
-        this.state.registerList[5] = '00000004'
-        this.state.dataSegmentList[1] = '10001000'
-        this.state.dataSegmentList[2] = '10011001'
-        this.state.dataSegmentList[3] = '10101010'
-        this.state.dataSegmentList[4] = '10111011'
-        this.state.registerList[10] = 'FFFFFFFF'
-        this.state.registerList[11] = '00000004'
+    /** mock data */
+    this.state.registerList[5] = '00000004'
+    this.state.dataSegmentList[1] = '10001000'
+    this.state.dataSegmentList[2] = '10011001'
+    this.state.dataSegmentList[3] = '10101010'
+    this.state.dataSegmentList[4] = '10111011'
+    this.state.registerList[10] = 'FFFFFFFF'
+    this.state.registerList[11] = '00000004'
   }
 
-  public resetRegisters(): void{
+  public resetRegisters(): void {
     this.setState({
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
@@ -238,6 +244,10 @@ export class IdeService extends Store<IdeState> {
 
   public runOnce(): void {
     console.log('running one step');
+    console.log('data', this.state.data)
+    console.log('registers', this.state.registers)
+    console.log('symbols', this.state.symbolByName)
+
     // start with 4096 decimal (1000 hex)
     const currentInstruction = this.state.instructionByAddress[this.state.currentInstructionAddress].basic
     console.log(this.state.currentInstructionAddress, currentInstruction)
@@ -289,124 +299,108 @@ export class IdeService extends Store<IdeState> {
   }
 
   private add(instruction) {
-    const rd_index = instruction[1].token.slice(1)
-    const rs1_index = instruction[2].token.slice(1)
-    const rs2_index = instruction[3].token.slice(1)
-    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
-    const rs2Dec = this.hex2dec(this.state.registerList[Number(rs2_index)])
+    const rd = instruction[1].token
+    const rs1 = instruction[2].token
+    const rs2 = instruction[3].token
+    const rs1Dec = this.hex2dec(this.state.registers[rs1])
+    const rs2Dec = this.hex2dec(this.state.registers[rs2])
     const rdDec = rs1Dec + rs2Dec;
-    this.state.registerList[rd_index] = this.dec2hex(rdDec, 8)
-    this.state.registers[instruction[1].token] = this.dec2hex(rdDec, 8);
-    console.log(this.state.registerList)
+
+    this.state.registers[rd] = this.dec2hex(rdDec, 8);
+    console.log(this.state.registers)
   }
 
   private slt(instruction) {
-    const rd_index = instruction[1].token.slice(1)
-    const rs1_index = instruction[2].token.slice(1)
-    const rs2_index = instruction[3].token.slice(1)
-    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
-    const rs2Dec = this.hex2dec(this.state.registerList[Number(rs2_index)])
-    let rd = 0;
+    const rd = instruction[1].token
+    const rs1 = instruction[2].token
+    const rs2 = instruction[3].token
+    const rs1Dec = this.hex2dec(this.state.registers[rs1])
+    const rs2Dec = this.hex2dec(this.state.registers[rs2])
+    let isLessThan = 0;
 
     if (rs1Dec < rs2Dec) {
-      rd = 1
+      isLessThan = 1
     }
 
-    this.state.registerList[rd_index] = this.dec2hex(rd, 8);
-    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
-    console.log(this.state.registerList)
+    this.state.registers[rd] = this.dec2hex(isLessThan, 8);
+    console.log(this.state.registers)
   }
 
   private addi(instruction) {
-    const rd_index = instruction[1].token.slice(1)
-    const rs1_index = instruction[2].token.slice(1)
+    const rd = instruction[1].token
+    const rs1 = instruction[2].token
     const immediateDec = instruction[3].token.includes('0x') ? this.hex2dec(instruction[3].token.slice(2)) : Number(instruction[3].token)
-    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
-    const rd = rs1Dec + immediateDec;
+    const rs1Dec = this.hex2dec(this.state.registers[rs1])
+    const rdValue = rs1Dec + immediateDec;
 
-    this.state.registerList[rd_index] = this.dec2hex(rd, 8)
-    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
-    console.log(this.state.registerList)
+    this.state.registers[rd] = this.dec2hex(rdValue, 8);
+    console.log(this.state.registers)
   }
 
   private slti(instruction) {
-    const rd_index = instruction[1].token.slice(1)
-    const rs1_index = instruction[2].token.slice(1)
+    const rd = instruction[1].token
+    const rs1 = instruction[2].token
     const immediateDec = instruction[3].token.includes('0x') ? this.hex2dec(instruction[3].token.slice(2)) : Number(instruction[3].token)
-    const rs1Dec = this.hex2dec(this.state.registerList[Number(rs1_index)])
-    let rd = 0;
+    const rs1Dec = this.hex2dec(this.state.registers[rs1])
+    let isLessThan = 0;
 
     if (rs1Dec < immediateDec) {
-      rd = 1
+      isLessThan = 1
     }
 
-    this.state.registerList[rd_index] = this.dec2hex(rd, 8);
-    this.state.registers[instruction[1].token] = this.dec2hex(rd, 8);
-    console.log(this.state.registerList)
+    this.state.registers[rd] = this.dec2hex(isLessThan, 8);
+    console.log(this.state.registers)
   }
 
   private lb(instruction) {
-    const rd_index = instruction[1].token.slice(1);
+    const rd = instruction[1].token
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
-    const rs1_index = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket).slice(1);
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
-    const effectiveAddress = this.hex2dec(Number(this.state.registerList[Number(rs1_index)])) + this.hex2dec(memoryAddress);
-    let byteBinary = this.state.dataSegmentList[effectiveAddress / 4]
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    // sign extension
-    if (byteBinary.slice(0, 1) === '0') {
-      byteBinary = `${'0'.repeat(24)}${byteBinary}`
-    } else {
-      byteBinary = `${'1'.repeat(24)}${byteBinary}`
-    }
+    let byteHex = this.state.data[effectiveAddress % 4].value.value
+    let byteBinary = this.hex2bin(byteHex, 8)
+    const signBit = byteBinary.slice(0, 1)
 
-    const byteHex = this.bin2hex(byteBinary)
-    this.state.registerList[rd_index] = byteHex;
-    console.log(this.state.registerList)
-    this.state.registers[instruction[1].token] = byteHex;
+    this.state.registers[rd] = this.bin2hex(byteBinary, signBit, 8);
+    console.log(this.state.registers)
   }
 
   private lh(instruction) {
-    const rd_index = instruction[1].token.slice(1);
+    const rd = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
-    const rs1_index = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket).slice(1);
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
-    const effectiveAddress = this.hex2dec(Number(this.state.registerList[Number(rs1_index)])) + this.hex2dec(memoryAddress);
-    const lowerByteBinary = this.state.dataSegmentList[effectiveAddress / 4]
-    const upperByteBinary = this.state.dataSegmentList[(effectiveAddress / 4) + 1]
-    let halfWordBinary = ''
-    // sign extension
-    if (upperByteBinary.slice(0, 1) === '0') {
-      halfWordBinary = `${'0'.repeat(16)}${upperByteBinary}${lowerByteBinary}`
-    } else {
-      halfWordBinary = `${'1'.repeat(16)}${upperByteBinary}${lowerByteBinary}`
-    }
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    const halfWordHex = this.bin2hex(halfWordBinary);
-    this.state.registerList[rd_index] = halfWordHex;
-    console.log(this.state.registerList)
-    this.state.registers[instruction[1].token] = halfWordHex;
+    const lowerByteHex = this.state.data[effectiveAddress % 4].value.value
+    const upperByteHex = this.state.data[(effectiveAddress % 4) + 1].value.value
+    const halfBinary = this.hex2bin(`${upperByteHex}${lowerByteHex}`, 16)
+    const signBit = halfBinary.slice(0, 1)
+
+    this.state.registers[rd] = this.bin2hex(halfBinary, signBit, 8);
+    console.log(this.state.registers)
   }
 
   private lw(instruction) {
-    const rd_index = instruction[1].token.slice(1);
+    const rd = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
-    const rs1_index = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket).slice(1);
+    const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
-    const effectiveAddress = this.hex2dec(Number(this.state.registerList[Number(rs1_index)])) + this.hex2dec(memoryAddress);
-    const byte1Binary = this.state.dataSegmentList[effectiveAddress / 4];
-    const byte2Binary = this.state.dataSegmentList[(effectiveAddress / 4) + 1];
-    const byte3Binary = this.state.dataSegmentList[(effectiveAddress / 4) + 2];
-    const byte4Binary = this.state.dataSegmentList[(effectiveAddress / 4) + 3];
-    const wordBinary = `${byte4Binary}${byte3Binary}${byte2Binary}${byte1Binary}`;
-    const wordHex = this.bin2hex(wordBinary);
-    this.state.registerList[rd_index] = wordHex;
-    this.state.registers[instruction[1].token] = wordHex;
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    console.log(this.state.registerList)
+    const byte1Hex = this.state.data[effectiveAddress % 4].value.value
+    const byte2Hex = this.state.data[(effectiveAddress % 4) + 1].value.value
+    const byte3Hex = this.state.data[(effectiveAddress % 4) + 2].value.value
+    const byte4Hex = this.state.data[(effectiveAddress % 4) + 3].value.value
+    const wordHex = `${byte4Hex}${byte3Hex}${byte2Hex}${byte1Hex}`.toUpperCase();
+
+    this.state.registers[rd] = wordHex;
+    console.log(this.state.registers)
   }
 
   public runAll(): void {
@@ -456,7 +450,7 @@ export class IdeService extends Store<IdeState> {
       currentInstructionAddress: this.state.currentInstructionAddress
     });
 
-  
+
   }
 
   // Sasalohin ni memory table (data)
@@ -478,15 +472,15 @@ export class IdeService extends Store<IdeState> {
       let item: any = data[i];
       if (item.type == '.byte') {
         j = addressOfNextWord + 1;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2,0); 
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2, 0);
       }
       if (item.type == '.half') {
         j = addressOfNextWord + 2;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4,0); 
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);
       }
       if (item.type == '.word') {
         j = addressOfNextWord + 4;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8,0); 
+        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);
       }
 
       /*
@@ -503,14 +497,13 @@ export class IdeService extends Store<IdeState> {
       // if wordCounter + numberOfWords in data[i].value exceeds 4, fill block with zero and assign the variable to the next block
       // current number of words in block + words dun sa current instruction na pina process % cache block size
       let modulo = currentCountOfWordsInBlock % Number(this.state.ideSettings.cacheBlockSize);
-      let assignToNextBlock = ( modulo > 0 && (modulo  + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) >  Number(this.state.ideSettings.cacheBlockSize)) ; // wtf this condition
+      let assignToNextBlock = (modulo > 0 && (modulo + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) > Number(this.state.ideSettings.cacheBlockSize)); // wtf this condition
       // 0x01234567
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
-      let specialCaseByteHalf = item.type == '.half' &&  (currentCountOfWordsInBlock  % Number(this.state.ideSettings.cacheBlockSize) == 1 && i > 0 && data[i - 1].type == '.byte')
+      let specialCaseByteHalf = item.type == '.half' && (currentCountOfWordsInBlock % Number(this.state.ideSettings.cacheBlockSize) == 1 && i > 0 && data[i - 1].type == '.byte')
       // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next block
-      if (assignToNextBlock)
-      {
+      if (assignToNextBlock) {
         i--;
         let dataWord: Word =
         {
@@ -546,11 +539,9 @@ export class IdeService extends Store<IdeState> {
       //   addressOfNextWord++;
       //   currentCountOfWordsInBlock++;
       // }
-      else
-      {
+      else {
 
-        for (let k = littleEndianStart; k > 0; k-=2 )
-        {
+        for (let k = littleEndianStart; k > 0; k -= 2) {
           // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex characters na ipapasok sa isang memory slot.
           let word = hexValue.substr(k - 1, 2);
           let dataWord: Word =
@@ -580,14 +571,20 @@ export class IdeService extends Store<IdeState> {
       }
     }
 
-    this.setState({
-      ...this.state,
-      data: newData,
-    });
+    const normalizeSymbol = newSymbols.reduce((acc, cur) => {
+      acc[cur.value.name] = {
+        type: cur.value.type,
+        address: cur.hexAddress,
+        value: cur.value.value
+      }
+      return acc;
+    }, {})
 
     this.setState({
       ...this.state,
+      data: newData,
       symbols: newSymbols,
+      symbolByName: normalizeSymbol
     });
   }
 
@@ -962,12 +959,12 @@ export class IdeService extends Store<IdeState> {
           break;
         }
       }
-      else if (codeBySection.macro[token] != undefined || codeBySection.macro[token.toLowerCase()] != undefined) tokenType = 'macro';
+      else if (codeBySection.macro && (codeBySection.macro[token] || codeBySection.macro[token.toLowerCase()])) tokenType = 'macro';
       else if (token.match(/^[a-z0-9]+$/i)) {
         symbolList.push(token);
         tokenType = 'branch';
       }
-      else if (codeBySection.data[token] != undefined || codeBySection.data[token.toLowerCase()] != undefined) tokenType = 'variable'; // case-sensitive ba dapat to?
+      else if (codeBySection.data && (codeBySection.data[token] || codeBySection.data[token.toLowerCase()])) tokenType = 'variable'; // case-sensitive ba dapat to?
 
       lineTokens.push({ 'token': token, 'type': tokenType });
       lineTokenTypes.push(tokenType);
@@ -1088,11 +1085,15 @@ export class IdeService extends Store<IdeState> {
   }
 
   private hex2bin(hex, n) {
-    return ("0".repeat(n) + (parseInt(hex, 16)).toString(2)).substr(-n);
+    return ("0".repeat(n) + parseInt(hex, 16).toString(2)).substr(-n);
   }
 
-  private bin2hex(bin: string) {
-    return parseInt(bin, 2).toString(16).toUpperCase();
+  private bin2hex(bin, sign, n) {
+    if (sign === '0') {
+      return (sign.repeat(n * 4) + parseInt(bin, 2)).toString(16).substr(-n).toUpperCase();
+    } else {
+      return parseInt(sign.repeat(n * 4) + bin, 2).toString(16).substr(-n).toUpperCase();
+    }
   }
 
   private dec2hex(dec, n) {
