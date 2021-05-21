@@ -37,7 +37,8 @@
   height: 100%;
   padding: 10px;
   box-sizing: border-box;
-  justify-content: center;
+  /* justify-content: center; */
+  flex-direction: column;
 }
 
 .tables {

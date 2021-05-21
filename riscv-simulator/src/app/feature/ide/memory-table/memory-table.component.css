@@ -26,6 +26,21 @@
   font-weight: 500;
 }
 
+tr.mat-row
+{
+  height: 32px;
+}
+
+td
+{
+  padding-left:12px;
+}
+
+th
+{
+  font-weight: bolder;
+  color: #000000
+}
 
 *
 {

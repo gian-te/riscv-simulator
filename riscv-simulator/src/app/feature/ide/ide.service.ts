@@ -610,12 +610,14 @@ export class IdeService extends Store<IdeState> {
           addressOfNextWord++;
           currentCountOfWordsInBlock++;
         }
-        let symbol: Word =
+        let symbol: SymbolModel =
         {
           decimalAddress: addressOfThisInstruction.toString(),
           hexAddress: this.convertStringToHex(addressOfThisInstruction.toString()),
           value: data[i],
-          memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
+          name: data[i].name,
+          type: data[i].type,
+          //memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
         }
         newSymbols.push(symbol);
         addressOfNextWord = j;

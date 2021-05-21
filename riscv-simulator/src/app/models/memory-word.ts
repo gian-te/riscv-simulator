@@ -9,13 +9,6 @@ export interface Word {
   memoryBlock?: string;
 }
 
-export interface SymbolModel {
-  hexAddress: string;
-  decimalAddress: string;
-  value: any;
-}
-
-
 export interface InstructionModel{
   address: string,
   decimalAddress: string,
@@ -35,4 +28,12 @@ export interface DataModel{
   hexAddress: string,
   value: string,
   memoryBlock: string,
+}
+
+export interface SymbolModel{
+  name: string,
+  type: string,
+  hexAddress: string
+  decimalAddress: string;
+  value: any;
 }

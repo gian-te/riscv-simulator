@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { IdeComponent } from './ide.component';
 import { IdeRoutingModule, routedComponents } from './ide.routing.module';
@@ -41,7 +43,7 @@ export const routes: Routes = [
     // add as needed depending on what we want to plug in to our UI
     FormsModule, // angular forms modules
     ReactiveFormsModule, // needed for formControl
-    MatMenuModule, MatGridListModule, MatCardModule, MatToolbarModule, MatButtonModule, MatDialogModule, MatInputModule, MatAutocompleteModule // angular material modules
+    MatMenuModule, MatGridListModule, MatCardModule, MatToolbarModule, MatButtonModule, MatDialogModule, MatInputModule, MatAutocompleteModule, MatTableModule, MatPaginatorModule// angular material modules
   ],
   exports:
     [
