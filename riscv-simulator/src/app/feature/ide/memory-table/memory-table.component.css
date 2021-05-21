@@ -5,8 +5,8 @@
   }
 
 .card {
-  width: 100%;
-  display: flex;
+  width: 49%;
+  display: inline-block;
   flex-direction: column;
   background-color: white;
   padding: 10px;
@@ -24,6 +24,11 @@
 .card p {
   font-size: 14px;
   font-weight: 500;
+}
+
+table 
+{
+  width: 100%;
 }
 
 tr.mat-row
