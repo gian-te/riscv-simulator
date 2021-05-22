@@ -37,6 +37,7 @@ export class IdeState {
   registerList: string[];
   dataSegmentList: string[];
   dataSegmentPointer: number = 0;
+  modifiedRegister: any;
   cache: any;
 }
 
@@ -227,8 +228,7 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
-      registers: { ...this.Register_Default_Values },
-      //data: this.Data_Default_Values
+      registers:  { ...this.Register_Default_Values }
     })
 
     // TODO: Tanggalin na lang pag ready na
@@ -244,6 +244,8 @@ export class IdeService extends Store<IdeState> {
     // start with 4096 decimal (1000 hex)
     const currentInstruction = this.state.instructionByAddress[this.state.currentInstructionAddress].basic
     console.log(this.state.currentInstructionAddress, currentInstruction)
+
+    let register = currentInstruction[1].token;
 
     switch (currentInstruction[0].token) {
       case 'ADD':
@@ -289,9 +291,10 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       currentInstructionAddress: this.state.currentInstructionAddress + 4,
+      registers: this.state.registers,
+      modifiedRegister: register
     })
 
-    this.updateRegisters(this.state.registers);
   }
 
   private add(instruction) {
@@ -638,14 +641,6 @@ export class IdeService extends Store<IdeState> {
       data: newData,
       symbols: newSymbols,
       symbolByName: normalizeSymbol
-    });
-  }
-
-  // Sasalohin ni register table 
-  updateRegisters(listOfSupportedRegisters: any) {
-    this.setState({
-      ...this.state,
-      registers: listOfSupportedRegisters,
     });
   }
 

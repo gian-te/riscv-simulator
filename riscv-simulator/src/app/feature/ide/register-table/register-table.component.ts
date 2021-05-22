@@ -35,5 +35,41 @@ export class RegisterTableComponent implements OnInit {
         console.log('list of registers updated');
         this.listOfSupportedRegisters = updatedRegisters;
       });
+    
+      this.ideService.state$
+      .pipe(
+        map(state => state.modifiedRegister),
+        filter(data => data != null),
+        distinctUntilChanged()
+      )
+      .subscribe(registerThatWasModified => {
+        var elem = document.getElementById(registerThatWasModified);
+        blinkingHighlight(elem);
+        // for (let i = 0; i < 3;)
+        // {
+        //   setTimeout(() => {
+        //     elem.style.background = "#ffffb2"
+        //     setTimeout(() => {
+        //       elem.style.background = "none"
+        //       i++;
+        //     }, (200), i);
+        //   }, 500, i);
+          
+        // }
+      });
+    
+    async function blinkingHighlight(elem: any)
+    {
+      const timer = ms => new Promise(res => setTimeout(res, ms))
+
+      for (let i = 0; i < 3;) {
+        console.log(i);
+        elem.style.background = "#ffffb2"
+        await timer(200); // then the created Promise can be awaited
+        elem.style.background = "none"
+        await timer(200); // then the created Promise can be awaited
+        i++;
+      }
+    }
   }
 }
