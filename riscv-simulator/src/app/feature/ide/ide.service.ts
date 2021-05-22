@@ -541,17 +541,20 @@ export class IdeService extends Store<IdeState> {
     for (let i = 0; i < data.length; i++) {
       let j = addressOfNextWord;
       let assignToNextDivisibleAddress = false;
-      //if (i != 0) {
-
-      // try to simulate +4 hex (tama ba to?)
-      // .byte = 8 bits = 1 word
-      // .half = 16 bits = 2 words
-      // .word = 32 bits = 4 words
 
       let item: any = data[i];
       if (item.type == '.byte') {
         j = addressOfNextWord + 1;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2, 0);
+        if (!item.value.includes('0x'))
+        {
+          // if value in text editor is decimal, convert to hex
+          data[i].value = '0x' + this.dec2hex(data[i].value, 2);
+        }
+        else
+        {
+          // pad zeroes if already in hex
+          data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2, 0);
+        }
       }
       if (item.type == '.half') {
         if (j % 2 != 0) {
@@ -559,7 +562,15 @@ export class IdeService extends Store<IdeState> {
         }
         else {
           j = addressOfNextWord + 2;
-          data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);
+          if (!item.value.includes('0x'))
+          {
+            // if value in text editor is decimal, convert to hex
+            data[i].value = '0x' + this.dec2hex(data[i].value, 4);
+          }
+          else
+          {
+            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);            
+          }
         }
       }
       if (item.type == '.word') {
@@ -568,7 +579,15 @@ export class IdeService extends Store<IdeState> {
         }
         else {
           j = addressOfNextWord + 4;
-          data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);
+          if (!item.value.includes('0x'))
+          {
+            // if value in text editor is decimal, convert to hex
+            data[i].value = '0x' + this.dec2hex(data[i].value, 8);
+          }
+          else
+          {
+            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);            
+          }
         }
       }
 
