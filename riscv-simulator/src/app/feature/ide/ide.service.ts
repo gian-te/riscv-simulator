@@ -245,7 +245,7 @@ export class IdeService extends Store<IdeState> {
     const currentInstruction = this.state.instructionByAddress[this.state.currentInstructionAddress].basic
     console.log(this.state.currentInstructionAddress, currentInstruction)
 
-    let register = currentInstruction[1].token;
+    let affectedRegister = currentInstruction[1].token;
 
     switch (currentInstruction[0].token) {
       case 'ADD':
@@ -292,7 +292,7 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       currentInstructionAddress: this.state.currentInstructionAddress + 4,
       registers: this.state.registers,
-      modifiedRegister: register
+      modifiedRegister: affectedRegister
     })
 
   }
@@ -351,6 +351,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
+  // with cache checking
   private lb(instruction) {
     const rd = instruction[1].token
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -368,6 +369,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
+  // with cache checking
   private lh(instruction) {
     const rd = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -387,6 +389,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
+  // with cache checking
   private lw(instruction) {
     const rd = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -409,6 +412,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
+  // with cache checking
   private sb(instruction) {
     const rs2 = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -426,6 +430,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.data)
   }
 
+  // with cache checking
   private sh(instruction) {
     const rs2 = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -446,6 +451,7 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.data)
   }
 
+  // with cache checking
   private sw(instruction) {
     const rs2 = instruction[1].token;
     const indexOpeningBracket = instruction[2].token.indexOf('(')
@@ -534,6 +540,7 @@ export class IdeService extends Store<IdeState> {
 
     for (let i = 0; i < data.length; i++) {
       let j = addressOfNextWord;
+      let assignToNextDivisibleAddress = false;
       //if (i != 0) {
 
       // try to simulate +4 hex (tama ba to?)
@@ -547,12 +554,22 @@ export class IdeService extends Store<IdeState> {
         data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2, 0);
       }
       if (item.type == '.half') {
-        j = addressOfNextWord + 2;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);
+        if (j % 2 != 0) {
+          assignToNextDivisibleAddress = true;
+        }
+        else {
+          j = addressOfNextWord + 2;
+          data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);
+        }
       }
       if (item.type == '.word') {
-        j = addressOfNextWord + 4;
-        data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);
+        if (j % 4 != 0) {
+          assignToNextDivisibleAddress = true;
+        }
+        else {
+          j = addressOfNextWord + 4;
+          data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);
+        }
       }
 
       /*
@@ -566,28 +583,13 @@ export class IdeService extends Store<IdeState> {
       2047 =
       */
       let addressOfThisInstruction = addressOfNextWord;
-      // if wordCounter + numberOfWords in data[i].value exceeds 4, fill block with zero and assign the variable to the next block
-      // current number of words in block + words dun sa current instruction na pina process % cache block size
-      let modulo = currentCountOfWordsInBlock % Number(this.state.ideSettings.cacheBlockSize);
-      let assignToNextBlock = (modulo > 0 && (modulo + (data[i].value.substr(2, data[i].value.length - 2).length) / 2) > Number(this.state.ideSettings.cacheBlockSize)); // wtf this condition
-      // 0x01234567
+
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
       
-      // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next block
-      if (assignToNextBlock) {
+      // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next slot
+      if (assignToNextDivisibleAddress) {
         i--;
-        // let dataWord: Word =
-        // {
-        //   decimalAddress: addressOfNextWord.toString(),
-        //   hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
-        //   value: {
-        //     name: data[i].name,
-        //     type: data[i].type,
-        //     value: '00'
-        //   },
-        //   memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-        // }
         newData.push('00');
         addressOfNextWord++;
         currentCountOfWordsInBlock++;
@@ -598,17 +600,6 @@ export class IdeService extends Store<IdeState> {
         for (let k = littleEndianStart; k > 0; k -= 2) {
           // [LITTLE ENDIAN]?: paatras, kunin yung tig 2 hex characters na ipapasok sa isang memory slot.
           let word = hexValue.substr(k - 1, 2);
-          // let dataWord: Word =
-          // {
-          //   decimalAddress: addressOfNextWord.toString(),
-          //   hexAddress: this.convertStringToHex(addressOfNextWord.toString()),
-          //   value: {
-          //     name: data[i].name,
-          //     type: data[i].type,
-          //     value: word
-          //   },
-          //   memoryBlock: (Math.floor((newData.length) / Number(this.state.ideSettings.cacheBlockSize))).toString()
-          // }
           newData.push(word);
           addressOfNextWord++;
           currentCountOfWordsInBlock++;
