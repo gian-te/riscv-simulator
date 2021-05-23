@@ -1,4 +1,4 @@
-<mat-card class="card">
+<mat-card class="card" style="height: 100%;">
   <!-- <mat-card class="card card-top"> -->
     <div>
     <p style="display: inline; float:left; margin-top: 10px;"><b>Cache Memory</b></p>
@@ -12,15 +12,49 @@
                [formControl]="myCacheBlockControl"
                [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of blocks" [value]="option">
-            {{option}}
+          <mat-option *ngFor="let option of blocks" [value]="option.cacheBlock">
+            {{option.cacheBlock}}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
     </form>
     </div>
-    <table style="border-collapse:collapse;" border="1px solid">
-      <!-- <button (click)="menuClicked($event, 'assemble')" > Test </button> -->
+    <table mat-table [dataSource]="cacheSource">
+      <!-- Address Column -->
+      <ng-container matColumnDef="cacheBlock">
+        <th mat-header-cell *matHeaderCellDef> Cache Block </th>
+        <td mat-cell *matCellDef="let element"> {{element.cacheBlock}} </td>
+      </ng-container>
+
+      <!-- Block Column -->
+      <ng-container matColumnDef="memoryBlock">
+        <th mat-header-cell *matHeaderCellDef> Memory Block </th>
+        <td mat-cell *matCellDef="let element"> {{element.memoryBlock}} </td>
+      </ng-container>
+
+      <!-- Valid Column -->
+      <ng-container matColumnDef="validBit">
+        <th mat-header-cell *matHeaderCellDef> Valid </th>
+        <td mat-cell *matCellDef="let element">{{element.validBit}}</td>
+      </ng-container>
+
+      <!-- Tag Column -->
+      <ng-container matColumnDef="tag">
+        <th mat-header-cell *matHeaderCellDef> Tag </th>
+        <td mat-cell *matCellDef="let element"> {{ element.tag }} </td>
+      </ng-container>
+
+        <!-- Data Column -->
+      <ng-container matColumnDef="data">
+        <th mat-header-cell *matHeaderCellDef> Data </th>
+        <td mat-cell *matCellDef="let element"> {{ element.data }} </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="['cacheBlock', 'memoryBlock', 'validBit', 'tag', 'data']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['cacheBlock', 'memoryBlock', 'validBit', 'tag', 'data'];"></tr>
+    </table>
+    <mat-paginator #cachePaginator [pageSizeOptions]="[4]" showFirstLastButtons></mat-paginator>
+    <!-- <table style="border-collapse:collapse;" border="1px solid">
       <tr>
         <td style="background-color: #9e9ac8;"> <span> Cache Block</span></td>
         <td style="background-color: #9e9ac8;"> <span> Memory Block</span></td>
@@ -35,6 +69,5 @@
     
         </td> 
       </tr>
-    </table>
-  <!-- </mat-card> -->
+    </table> -->
 </mat-card>

@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject, UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
-import { Word , SymbolModel, InstructionModel} from 'src/app/models/memory-word';
+import { CacheModel , SymbolModel, InstructionModel} from 'src/app/models/memory-word';
 
 import { Store } from '../../core/state-management/state-management';
 
@@ -31,14 +31,14 @@ export class IdeState {
   data: string[];
   isAssembling: boolean = false;
   registers: any;
-  ideSettings: IdeSettings;
+  ideSettings: IdeSettings = {cacheBlockSize: '4', numCacheBlocks: '4'};
   currentInstructionAddress: number = 4096;
   codeLines: { token: string; type: string }[][];
   registerList: string[];
   dataSegmentList: string[];
   dataSegmentPointer: number = 0;
   modifiedRegister: any;
-  cache: any;
+  cache: CacheModel[];
 }
 
 
@@ -228,7 +228,8 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
-      registers:  { ...this.Register_Default_Values }
+      registers: { ...this.Register_Default_Values },
+      cache: Array(Number(this.state.ideSettings.numCacheBlocks)).fill(null).map((elem, index) => ({ cacheBlock: index.toString() }))
     })
 
     // TODO: Tanggalin na lang pag ready na
@@ -661,6 +662,7 @@ export class IdeService extends Store<IdeState> {
       ideSettings: ideSettings,
     });
 
+    this.initialize();
     if (this.state.code) {
       // refresh the memory by trigerring a new build
       this.updateCode(this.state.code);

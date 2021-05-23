@@ -136,7 +136,6 @@ export class MemoryTableComponent implements OnInit {
       this.dataSource = new MatTableDataSource<DataModel>(this.filteredDataOptions);
       this.dataSource.paginator = this.dataPaginator;  
     }
-
   }
 
   private refreshInstructionTableBindings() {
@@ -150,7 +149,6 @@ export class MemoryTableComponent implements OnInit {
   private refreshPaginationBasedOnCurrentInstruction(idx: number) {
     if (this.filteredInstructionOptions)
     {
-      var that = this;
       this.instructionSource = new MatTableDataSource<DataModel>(this.filteredInstructionOptions);
       this.instructionPaginator.pageIndex = Math.floor(idx / 4);
       this.instructionSource.paginator = this.instructionPaginator;

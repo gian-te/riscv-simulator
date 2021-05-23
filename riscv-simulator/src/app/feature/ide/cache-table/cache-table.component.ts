@@ -1,12 +1,14 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { IdeService } from '../ide.service';
-import { Word } from '../../../models/memory-word'
+import { CacheModel, Word } from '../../../models/memory-word'
 import { IdeSettings } from 'src/app/models/ide-settings';
 
 // needed for search bar
 import { FormControl } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 
 @Component({
@@ -24,31 +26,17 @@ export class CacheTableComponent implements OnInit {
       numCacheBlocks: '4', // number of blocks
       cacheBlockSize: '4'    // 4 words per block
     };
-  blocks = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
+  blocks: any = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
 
   myCacheBlockControl = new FormControl();
 
-  filteredCacheBlockOptions: number[];
+  filteredCacheBlockOptions: CacheModel[];
+
+  cacheSource: any;
+
+  @ViewChild('cachePaginator') cachePaginator: MatPaginator;
 
   constructor(private ideService: IdeService) {
-    // pano natin pagkakasyahin 1024 slots sa UI? lol
-    // i-bibind natin ito dun sa service, sa service dapat naka lagay para auto update
-    this.instructions = [
-      // {
-      //   address: "1000",
-      //   value: "0x00000000",
-      //   //color: 'lightblue'
-      // }
-    ];
-
-    this.data = [
-      // {
-      //   address: "0000",
-      //   value: "0x00000000",
-      //   //color: 'lightblue'
-      // }
-    ];
-
 
   }
 
@@ -63,26 +51,19 @@ export class CacheTableComponent implements OnInit {
     // taga salo ng code
     this.ideService.state$
       .pipe(
-        map(state => state.instructions),
+        map(state => state.cache),
         filter(data => data != null),
         distinctUntilChanged()
       )
-      .subscribe(newInstructions => {
-        that.instructions = newInstructions;
+      .subscribe(newCacheItems => {
+        that.blocks = []
+        that.blocks = newCacheItems;
+        that.filteredCacheBlockOptions = this.blocks;
+        that.refreshCacheTableBindings();
       });
+
     
-      // taga salo ng data
-      this.ideService.state$
-      .pipe(
-        map(state => state.data),
-        filter(data => data != null),
-        distinctUntilChanged()
-      )
-      .subscribe(newData => {
-        //that.data = newData;
-      });
-    
-     // taga salo ng ide settings, pang divide ng tables
+     // taga salo ng ide settings, pang divide ng blocks
      this.ideService.state$
      .pipe(
        map(state => state.ideSettings),
@@ -91,19 +72,28 @@ export class CacheTableComponent implements OnInit {
      )
      .subscribe(newSettings => {
        that.ideSettings = newSettings;
-       that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(0).map((x, i) => i);
+       that.blocks = Array(Number(that.ideSettings.numCacheBlocks)).fill(null).map((x, i) => ({  }));
        that.filteredCacheBlockOptions = that.blocks;
      });
     
      this.myCacheBlockControl.valueChanges.subscribe(newValue => {
-      this.filteredCacheBlockOptions = this._filter(this.blocks, newValue);
+       this.filteredCacheBlockOptions = this.filterCacheBlocks(this.blocks, newValue);
+       this.refreshCacheTableBindings();
     });
   }
-  
-  private _filter(collection: number[], value: string): number[] {
-    const filterValue = value;
 
-    return collection.filter(option => option.toString().includes(filterValue));
+  private refreshCacheTableBindings() {
+    if (this.filteredCacheBlockOptions)
+    {
+      this.cacheSource = new MatTableDataSource<CacheModel>(this.filteredCacheBlockOptions);
+      this.cacheSource.paginator = this.cachePaginator;  
+    }
+  }
+  
+  private filterCacheBlocks(collection: CacheModel[], value: string): CacheModel[] {
+    const filterValue = value.toUpperCase();
+
+    return collection.filter(option => option.cacheBlock.toUpperCase().includes(filterValue));
   }
   
   // hack

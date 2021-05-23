@@ -37,3 +37,12 @@ export interface SymbolModel{
   decimalAddress: string;
   value: any;
 }
+
+export interface CacheModel
+{
+  cacheBlock: string,
+  memoryBlock?: string,
+  validBit?: string,
+  tag?: string,
+  data?: string
+}
