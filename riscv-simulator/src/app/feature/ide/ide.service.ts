@@ -1072,7 +1072,9 @@ export class IdeService extends Store<IdeState> {
         pattern1Match = false, pattern2Match = false, pattern3Match = false, pattern4Match = false, pattern5Match = false, pattern6Match = false, patternBranchMatch = false;
       }
       else if (patternBranchMatch) {
-        const branchAddress = 4096 + (i * 4);
+        // const branchAddress = 4096 + (i * 4);
+        const branchAddress = 4096 + ((codeLines.length) * 4);
+
         this.branch_address[lineTokens.slice(0, 1)[0].token.slice(0, -1)] = branchAddress.toString(16);
         lineTokens.push({ 'token': `${branchAddress.toString(16)}`, 'type': 'address' })
         codeLines.push(lineTokens.slice(1));
