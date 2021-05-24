@@ -531,14 +531,13 @@ export class IdeService extends Store<IdeState> {
 
   public runAll(): void {
     console.log('running all steps');
-    // start with 4096 decimal (1000 hex)
-    this.state.currentInstructionAddress = 4096;
-    let addr = this.state.currentInstructionAddress;
-    // let instrctn = this.state.instructions.filter(instruction => instruction.decimalAddress == addr);
-    // console.log(instrctn);
-    // add logic here to run the instruction
-    // loop and then increment this.state.currentInstructionAddress by 4 words (32 bits to go to the next instruction)?
+    let n = this.state.instructions.length
+    while (n !== 0) {
+      this.runOnce();
+      n--
+    }
   }
+
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
     let newInstructions: InstructionModel[] = [];
