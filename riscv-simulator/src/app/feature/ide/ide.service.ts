@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject, UnsubscriptionError } from 'rxjs';
 import { IdeSettings } from 'src/app/models/ide-settings';
-import { CacheModel , SymbolModel, InstructionModel} from 'src/app/models/memory-word';
+import { CacheModel, SymbolModel, InstructionModel } from 'src/app/models/memory-word';
 
 import { Store } from '../../core/state-management/state-management';
 
@@ -11,7 +11,7 @@ import { Store } from '../../core/state-management/state-management';
 export class IdeState {
   // the data structure for the code is not yet defined
   code: any = '';
-  symbols: SymbolModel[]; // most likely a dictionary
+  symbols: SymbolModel[] = []; // most likely a dictionary
   symbolByName: {
     [name: string]: {
       type: string;
@@ -31,7 +31,7 @@ export class IdeState {
   data: string[];
   isAssembling: boolean = false;
   registers: any;
-  ideSettings: IdeSettings = {cacheBlockSize: '4', numCacheBlocks: '4'};
+  ideSettings: IdeSettings = { cacheBlockSize: '4', numCacheBlocks: '4' };
   currentInstructionAddress: number = 4096;
   codeLines: { token: string; type: string }[][];
   registerList: string[];
@@ -39,6 +39,7 @@ export class IdeState {
   dataSegmentPointer: number = 0;
   modifiedRegister: any;
   cache: CacheModel[];
+  isJumpingBranch = false;
 }
 
 
@@ -208,19 +209,6 @@ export class IdeService extends Store<IdeState> {
 
   constructor() {
     super(new IdeState());
-
-  }
-
-  // TODO: Tanggalin na lang pag ready na
-  mockRegisterValues() {
-    /** mock data */
-    this.state.registerList[5] = '00000004'
-    this.state.dataSegmentList[1] = '10001000'
-    this.state.dataSegmentList[2] = '10011001'
-    this.state.dataSegmentList[3] = '10101010'
-    this.state.dataSegmentList[4] = '10111011'
-    this.state.registerList[10] = 'FFFFFFFF'
-    this.state.registerList[11] = '00000004'
   }
 
   public initialize(): void {
@@ -229,11 +217,12 @@ export class IdeService extends Store<IdeState> {
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
       registers: { ...this.Register_Default_Values },
-      cache: Array(Number(this.state.ideSettings.numCacheBlocks)).fill(null).map((elem, index) => ({ cacheBlock: index.toString() }))
+      cache: Array(Number(this.state.ideSettings.numCacheBlocks) * 4).fill({
+        validBit: '',
+        tag: '',
+        data: ''
+      })
     })
-
-    // TODO: Tanggalin na lang pag ready na
-    this.mockRegisterValues();
   }
 
   public runOnce(): void {
@@ -241,6 +230,11 @@ export class IdeService extends Store<IdeState> {
     console.log('data', this.state.data)
     console.log('registers', this.state.registers)
     console.log('symbols', this.state.symbolByName)
+
+    this.setState({
+      ...this.state,
+      isJumpingBranch: false
+    })
 
     // start with 4096 decimal (1000 hex)
     const currentInstruction = this.state.instructionByAddress[this.state.currentInstructionAddress].basic
@@ -280,22 +274,31 @@ export class IdeService extends Store<IdeState> {
         this.lw(currentInstruction)
         break;
       case 'BEQ':
+        this.beq(currentInstruction)
         break;
       case 'BNE':
+        this.bne(currentInstruction)
         break;
       case 'BLT':
+        this.blt(currentInstruction)
         break;
       case 'BGE':
+        this.bge(currentInstruction)
         break;
     }
 
     this.setState({
       ...this.state,
-      currentInstructionAddress: this.state.currentInstructionAddress + 4,
       registers: this.state.registers,
       modifiedRegister: affectedRegister
     })
 
+    if (!this.state.isJumpingBranch) {
+      this.setState({
+        ...this.state,
+        currentInstructionAddress: this.state.currentInstructionAddress + 4,
+      })
+    }
   }
 
   private add(instruction) {
@@ -379,8 +382,6 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    // const lowerByteHex = this.state.data[effectiveAddress].value.value
-    // const upperByteHex = this.state.data[effectiveAddress + 1].value.value
     const lowerByteHex = this.state.data[effectiveAddress]
     const upperByteHex = this.state.data[effectiveAddress + 1]
     const halfBinary = this.hex2bin(`${upperByteHex}${lowerByteHex}`, 16)
@@ -399,10 +400,6 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    // const byte1Hex = this.state.data[effectiveAddress].value.value
-    // const byte2Hex = this.state.data[effectiveAddress + 1].value.value
-    // const byte3Hex = this.state.data[effectiveAddress + 2].value.value
-    // const byte4Hex = this.state.data[effectiveAddress + 3].value.value
     const byte1Hex = this.state.data[effectiveAddress]
     const byte2Hex = this.state.data[effectiveAddress + 1]
     const byte3Hex = this.state.data[effectiveAddress + 2]
@@ -425,7 +422,6 @@ export class IdeService extends Store<IdeState> {
     const wordHex = this.state.registers[rs2]
     const byteHex = wordHex.slice(6, 8)
 
-    // this.state.data[effectiveAddress].value.value = byteHex
     this.state.data[effectiveAddress] = byteHex
 
     console.log(this.state.data)
@@ -444,8 +440,6 @@ export class IdeService extends Store<IdeState> {
     const byte1Hex = wordHex.slice(6, 8)
     const byte2Hex = wordHex.slice(4, 6)
 
-    // this.state.data[effectiveAddress].value.value = byte1Hex
-    // this.state.data[effectiveAddress + 1].value.value = byte2Hex
     this.state.data[effectiveAddress] = byte1Hex
     this.state.data[effectiveAddress + 1] = byte2Hex
 
@@ -467,10 +461,6 @@ export class IdeService extends Store<IdeState> {
     const byte3Hex = wordHex.slice(2, 4)
     const byte4Hex = wordHex.slice(0, 2)
 
-    // this.state.data[effectiveAddress].value.value = byte1Hex
-    // this.state.data[effectiveAddress + 1].value.value = byte2Hex
-    // this.state.data[effectiveAddress + 2].value.value = byte3Hex
-    // this.state.data[effectiveAddress + 3].value.value = byte4Hex
     this.state.data[effectiveAddress] = byte1Hex
     this.state.data[effectiveAddress + 1] = byte2Hex
     this.state.data[effectiveAddress + 2] = byte3Hex
@@ -479,16 +469,75 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.data)
   }
 
+  private beq(instruction) {
+    const rs1 = this.state.registers[instruction[1].token];
+    const rs2 = this.state.registers[instruction[2].token];
+    const addressDec = this.hex2dec(this.state.symbolByName[instruction[3].token].address)
+
+    if (rs1 === rs2) {
+      this.setState({
+        ...this.state,
+        currentInstructionAddress: addressDec,
+        isJumpingBranch: true
+      })
+    }
+    console.log('current instruction address', this.state.currentInstructionAddress)
+  }
+
+  private bne(instruction) {
+    const rs1 = this.state.registers[instruction[1].token];
+    const rs2 = this.state.registers[instruction[2].token];
+    const addressDec = this.hex2dec(this.state.symbolByName[instruction[3].token].address)
+
+    if (rs1 !== rs2) {
+      this.setState({
+        ...this.state,
+        currentInstructionAddress: addressDec,
+        isJumpingBranch: true
+      })
+    }
+    console.log('current instruction address', this.state.currentInstructionAddress)
+  }
+
+  private blt(instruction) {
+    const rs1 = this.hex2dec(this.state.registers[instruction[1].token]);
+    const rs2 = this.hex2dec(this.state.registers[instruction[2].token]);
+    const addressDec = this.hex2dec(this.state.symbolByName[instruction[3].token].address)
+
+    if (rs1 < rs2) {
+      this.setState({
+        ...this.state,
+        currentInstructionAddress: addressDec,
+        isJumpingBranch: true
+      })
+    }
+    console.log('current instruction address', this.state.currentInstructionAddress)
+  }
+
+  private bge(instruction) {
+    const rs1 = this.hex2dec(this.state.registers[instruction[1].token]);
+    const rs2 = this.hex2dec(this.state.registers[instruction[2].token]);
+    const addressDec = this.hex2dec(this.state.symbolByName[instruction[3].token].address)
+
+    if (rs1 >= rs2) {
+      this.setState({
+        ...this.state,
+        currentInstructionAddress: addressDec,
+        isJumpingBranch: true
+      })
+    }
+    console.log('current instruction address', this.state.currentInstructionAddress)
+  }
+
   public runAll(): void {
     console.log('running all steps');
-    // start with 4096 decimal (1000 hex)
-    this.state.currentInstructionAddress = 4096;
-    let addr = this.state.currentInstructionAddress;
-    // let instrctn = this.state.instructions.filter(instruction => instruction.decimalAddress == addr);
-    // console.log(instrctn);
-    // add logic here to run the instruction
-    // loop and then increment this.state.currentInstructionAddress by 4 words (32 bits to go to the next instruction)?
+    let n = this.state.instructions.length
+    while (n !== 0) {
+      this.runOnce();
+      n--
+    }
   }
+
   // Sasalohin ni memory table (instructions)
   public updateInstructions(inst): void {
     let newInstructions: InstructionModel[] = [];
@@ -507,9 +556,9 @@ export class IdeService extends Store<IdeState> {
         decimalAddress: j.toString(),
         hexAddress: this.convertStringToHex(j.toString()),
         memoryBlock: (Math.floor((newInstructions.length + this.state.data.length) / Number(this.state.ideSettings.cacheBlockSize))).toString(),
-        lineOfCode: this.state.codeLines[i].map(function(elem){
-                                                return elem.token;
-                                            }).join(",")
+        lineOfCode: this.state.codeLines[i].map(function (elem) {
+          return elem.token;
+        }).join(",")
       }
       newInstructions.push(instr);
     }
@@ -546,13 +595,11 @@ export class IdeService extends Store<IdeState> {
       let item: any = data[i];
       if (item.type == '.byte') {
         j = addressOfNextWord + 1;
-        if (!item.value.includes('0x'))
-        {
+        if (!item.value.includes('0x')) {
           // if value in text editor is decimal, convert to hex
           data[i].value = '0x' + this.dec2hex(data[i].value, 2);
         }
-        else
-        {
+        else {
           // pad zeroes if already in hex
           data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(2, 0);
         }
@@ -563,14 +610,12 @@ export class IdeService extends Store<IdeState> {
         }
         else {
           j = addressOfNextWord + 2;
-          if (!item.value.includes('0x'))
-          {
+          if (!item.value.includes('0x')) {
             // if value in text editor is decimal, convert to hex
             data[i].value = '0x' + this.dec2hex(data[i].value, 4);
           }
-          else
-          {
-            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);            
+          else {
+            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(4, 0);
           }
         }
       }
@@ -580,14 +625,12 @@ export class IdeService extends Store<IdeState> {
         }
         else {
           j = addressOfNextWord + 4;
-          if (!item.value.includes('0x'))
-          {
+          if (!item.value.includes('0x')) {
             // if value in text editor is decimal, convert to hex
             data[i].value = '0x' + this.dec2hex(data[i].value, 8);
           }
-          else
-          {
-            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);            
+          else {
+            data[i].value = '0x' + data[i].value.substr(2, data[i].value.length - 2).padStart(8, 0);
           }
         }
       }
@@ -606,7 +649,7 @@ export class IdeService extends Store<IdeState> {
 
       let hexValue = data[i].value.substr(2, data[i].value.length - 2); //01234567
       let littleEndianStart = hexValue.length - 1;
-      
+
       // bawal tumatawid ng block yung variable pag hindi kasya - pag lampas, go to next slot
       if (assignToNextDivisibleAddress) {
         i--;
@@ -638,7 +681,7 @@ export class IdeService extends Store<IdeState> {
       }
     }
 
-    const normalizeSymbol = newSymbols.reduce((acc, cur) => {
+    const normalizeSymbol = [...this.state.symbols, ...newSymbols].reduce((acc, cur) => {
       acc[cur.value.name] = {
         type: cur.value.type,
         address: cur.hexAddress,
@@ -650,7 +693,10 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       data: newData,
-      symbols: newSymbols,
+      symbols: [
+        ...this.state.symbols,
+        ...newSymbols
+      ],
       symbolByName: normalizeSymbol
     });
   }
@@ -1074,8 +1120,28 @@ export class IdeService extends Store<IdeState> {
       else if (patternBranchMatch) {
         // const branchAddress = 4096 + (i * 4);
         const branchAddress = 4096 + ((codeLines.length) * 4);
-
-        this.branch_address[lineTokens.slice(0, 1)[0].token.slice(0, -1)] = branchAddress.toString(16);
+        const branchName = lineTokens.slice(0, 1)[0].token.slice(0, -1)
+        this.setState({
+          ...this.state,
+          symbols: [
+            ...this.state.symbols,
+            {
+              name: branchName,
+              type: 'branch',
+              hexAddress: branchAddress.toString(16),
+              decimalAddress: branchAddress.toString(),
+              value: ''
+            }
+          ],
+          symbolByName: {
+            ...this.state.symbolByName,
+            [branchName]: {
+              type: 'branch',
+              address: branchAddress.toString(16),
+            }
+          }
+        })
+        this.branch_address[branchName] = branchAddress.toString(16);
         lineTokens.push({ 'token': `${branchAddress.toString(16)}`, 'type': 'address' })
         codeLines.push(lineTokens.slice(1));
         lineTokenTypes = [];
