@@ -38,8 +38,10 @@ export class IdeState {
   dataSegmentList: string[];
   dataSegmentPointer: number = 0;
   modifiedRegister: any;
-  cache: CacheModel[];
   isJumpingBranch = false;
+  cache: CacheModel[];
+  cacheHit = 0;
+  cacheMiss = 0;
 }
 
 
@@ -217,10 +219,12 @@ export class IdeService extends Store<IdeState> {
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
       registers: { ...this.Register_Default_Values },
-      cache: Array(Number(this.state.ideSettings.numCacheBlocks) * Number(this.state.ideSettings.cacheBlockSize)).fill({
-        validBit: '',
+      cache: Array(Number(this.state.ideSettings.numCacheBlocks) * Number(this.state.ideSettings.cacheBlockSize) * 4).fill({
+        validBit: '0',
         tag: '',
-        data: ''
+        data: '',
+        cacheBlock: '',
+        memoryBlock: ''
       })
     })
   }
@@ -355,6 +359,21 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
+  private caching(mb, cb, addr) {
+    const blockToBeCached = this.state.data.slice(mb * cb, (mb + 1) * cb)
+    const cacheBlock = mb % Number(this.state.ideSettings.numCacheBlocks)
+
+    blockToBeCached.forEach((byte, i) => {
+      this.state.cache[cacheBlock + i] = {
+        validBit: '0',
+        tag: this.dec2hex(addr + (4 * i), 8).slice(0, 4),
+        data: byte,
+        cacheBlock: cacheBlock.toString(),
+        memoryBlock: mb.toString()
+      }
+    })
+  }
+
   // with cache checking
   private lb(instruction) {
     const rd = instruction[1].token
@@ -364,13 +383,31 @@ export class IdeService extends Store<IdeState> {
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
-    // let byteHex = this.state.data[effectiveAddress].value.value
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      console.log('cache hit')
+      this.setState({
+        ...this.state,
+        cacheHit: this.state.cacheHit + 1
+      })
+    } else {
+      console.log('cache miss')
+      this.setState({
+        ...this.state,
+        cacheMiss: this.state.cacheMiss + 1
+      })
+
+      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    }
+
     let byteHex = this.state.data[effectiveAddress]
     let byteBinary = this.hex2bin(byteHex, 8)
     const signBit = byteBinary.slice(0, 1)
 
     this.state.registers[rd] = this.bin2hex(byteBinary, signBit, 8);
-    console.log(this.state.registers)
+    console.log(this.state.registers, this.state.cache)
   }
 
   // with cache checking
@@ -381,6 +418,25 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      console.log('cache hit')
+      this.setState({
+        ...this.state,
+        cacheHit: this.state.cacheHit + 1
+      })
+    } else {
+      console.log('cache miss')
+      this.setState({
+        ...this.state,
+        cacheMiss: this.state.cacheMiss + 1
+      })
+
+      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    }
 
     const lowerByteHex = this.state.data[effectiveAddress]
     const upperByteHex = this.state.data[effectiveAddress + 1]
@@ -399,6 +455,25 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      console.log('cache hit')
+      this.setState({
+        ...this.state,
+        cacheHit: this.state.cacheHit + 1
+      })
+    } else {
+      console.log('cache miss')
+      this.setState({
+        ...this.state,
+        cacheMiss: this.state.cacheMiss + 1
+      })
+
+      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    }
 
     const byte1Hex = this.state.data[effectiveAddress]
     const byte2Hex = this.state.data[effectiveAddress + 1]
