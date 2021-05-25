@@ -225,7 +225,9 @@ export class IdeService extends Store<IdeState> {
         data: '',
         cacheBlock: '',
         memoryBlock: ''
-      })
+      }),
+      cacheHit: 0,
+      cacheMiss: 0
     })
   }
 
@@ -291,18 +293,19 @@ export class IdeService extends Store<IdeState> {
         break;
     }
 
-    this.setState({
-      ...this.state,
-      registers: this.state.registers,
-      modifiedRegister: affectedRegister
-    })
-
     if (!this.state.isJumpingBranch) {
       this.setState({
         ...this.state,
         currentInstructionAddress: this.state.currentInstructionAddress + 4,
       })
     }
+
+    this.setState({
+      ...this.state,
+      registers: this.state.registers,
+      modifiedRegister: affectedRegister,
+      cache: JSON.parse(JSON.stringify(this.state.cache))
+    })
   }
 
   private add(instruction) {
@@ -359,7 +362,32 @@ export class IdeService extends Store<IdeState> {
     console.log(this.state.registers)
   }
 
-  private caching(mb, cb, addr) {
+  private isInCache(memoryBlock): boolean {
+    let retVal = false;
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      console.log('cache hit')
+      this.setState({
+        ...this.state,
+        cacheHit: this.state.cacheHit + 1
+      });
+
+      retVal = true;
+
+    } else {
+      console.log('cache miss')
+      this.setState({
+        ...this.state,
+        cacheMiss: this.state.cacheMiss + 1
+      });
+
+      retVal = false;
+    }
+
+    return retVal;
+  }
+
+  private updateCache(mb, cb, addr) {
+    // 4 words, but in the form of bytes. 1 word = 4 bytes, so 16 bytes will be cached in a cache block
     const blockToBeCached = this.state.data.slice(mb * cb, (mb + 1) * cb)
     const cacheBlock = mb % Number(this.state.ideSettings.numCacheBlocks)
 
@@ -371,7 +399,7 @@ export class IdeService extends Store<IdeState> {
         cacheBlock: cacheBlock.toString(),
         memoryBlock: mb.toString()
       }
-    })
+    });
   }
 
   // with cache checking
@@ -386,20 +414,10 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
-      console.log('cache hit')
-      this.setState({
-        ...this.state,
-        cacheHit: this.state.cacheHit + 1
-      })
-    } else {
-      console.log('cache miss')
-      this.setState({
-        ...this.state,
-        cacheMiss: this.state.cacheMiss + 1
-      })
-
-      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    // check if cache hit / miss:
+    if (!this.isInCache(memoryBlock))
+    {
+      this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
     let byteHex = this.state.data[effectiveAddress]
@@ -422,20 +440,10 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
-      console.log('cache hit')
-      this.setState({
-        ...this.state,
-        cacheHit: this.state.cacheHit + 1
-      })
-    } else {
-      console.log('cache miss')
-      this.setState({
-        ...this.state,
-        cacheMiss: this.state.cacheMiss + 1
-      })
-
-      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    // check if cache hit / miss:
+    if (!this.isInCache(memoryBlock))
+    {
+      this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
     const lowerByteHex = this.state.data[effectiveAddress]
@@ -459,20 +467,10 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
-      console.log('cache hit')
-      this.setState({
-        ...this.state,
-        cacheHit: this.state.cacheHit + 1
-      })
-    } else {
-      console.log('cache miss')
-      this.setState({
-        ...this.state,
-        cacheMiss: this.state.cacheMiss + 1
-      })
-
-      this.caching(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
+    // check if cache hit / miss:
+    if (!this.isInCache(memoryBlock))
+    {
+      this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
     const byte1Hex = this.state.data[effectiveAddress]
