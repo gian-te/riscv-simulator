@@ -217,7 +217,7 @@ export class IdeService extends Store<IdeState> {
       registerList: Array(33).fill('0'.repeat(8)), // initialize register
       dataSegmentList: Array(524).fill('0'.repeat(8)), // initialize data segment section in memory
       registers: { ...this.Register_Default_Values },
-      cache: Array(Number(this.state.ideSettings.numCacheBlocks) * 4).fill({
+      cache: Array(Number(this.state.ideSettings.numCacheBlocks) * Number(this.state.ideSettings.cacheBlockSize)).fill({
         validBit: '',
         tag: '',
         data: ''
