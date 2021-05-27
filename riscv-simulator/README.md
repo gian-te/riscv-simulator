@@ -17,6 +17,11 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
+## Azure PaaS Deployment
+
+This RISC-V simulator uses Azure App Service to host the Angular web application. For more info on deploying an Angular web application to Azure PaaS, click here:
+Deployment: https://www.c-sharpcorner.com/article/easily-deploy-angular-app-to-azure-from-visual-studio-code/
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
