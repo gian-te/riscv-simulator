@@ -365,7 +365,7 @@ export class IdeService extends Store<IdeState> {
   private isInCache(memoryBlock): boolean {
     let retVal = false;
     if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
-      console.log('cache hit')
+      console.log('cache hit, block ' + memoryBlock)
       this.setState({
         ...this.state,
         cacheHit: this.state.cacheHit + 1
@@ -374,7 +374,7 @@ export class IdeService extends Store<IdeState> {
       retVal = true;
 
     } else {
-      console.log('cache miss')
+      console.log('cache miss, block ' + memoryBlock)
       this.setState({
         ...this.state,
         cacheMiss: this.state.cacheMiss + 1

@@ -35,12 +35,12 @@ export class TextEditorComponent implements OnInit {
     addi x12, x0, 0x08
     L1: addi x12, x0, 0x07
     LB x10, 0(x5)
-    LB x10, 0(x5)
+    LB x11, 1(x5)
     LW x31, 0(x5)
-    LB x2, c(x5)
-    LB x1, e(x5)
+    LB x2, C(x5)
+    LB x1, E(x5)
     LB x3, 15(x5)
-    LW x29, f(x5)
+    LW x29, F(x5)
   `
 
   ngOnInit() {
