@@ -1290,8 +1290,16 @@ export class IdeService extends Store<IdeState> {
   }
 
   public bin2hex(bin, sign, n) {
+   
+    
+    // if (sign === '0') {
+    //   return (sign.repeat(n * 4) + parseInt(bin, 2)).toString(16).substr(-n).toUpperCase();
+    // } else {
+    //   return parseInt(sign.repeat(n * 4) + bin, 2).toString(16).substr(-n).toUpperCase();
+    // }
+
     if (sign === '0') {
-      return (sign.repeat(n * 4) + parseInt(bin, 2)).toString(16).substr(-n).toUpperCase();
+      return (sign.repeat(n) + parseInt(bin, 2).toString(16)).substr(-n).toUpperCase();
     } else {
       return parseInt(sign.repeat(n * 4) + bin, 2).toString(16).substr(-n).toUpperCase();
     }
