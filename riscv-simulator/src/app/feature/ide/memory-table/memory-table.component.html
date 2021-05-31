@@ -35,7 +35,14 @@
       <!-- Value Column -->
       <ng-container matColumnDef="value">
         <th mat-header-cell *matHeaderCellDef> Value </th>
-        <td mat-cell *matCellDef="let element"> {{'0x' + element.value }} </td>
+        <td mat-cell *matCellDef="let element">
+          <input
+          id="{{ element.hexAddress}}"
+          type="text"
+          (keyup)="onMemoryEdit($event)"
+          [value]="'0x' + element.value"
+          matInput>
+        </td>
       </ng-container>
 
       

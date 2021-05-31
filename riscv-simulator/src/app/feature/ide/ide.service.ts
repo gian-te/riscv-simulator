@@ -1357,9 +1357,12 @@ export class IdeService extends Store<IdeState> {
   }
 
   updateRegisterFromUi(register: any, value: any) {
-    if (value)
-    {
-      this.state.registers[register] = value;  
-    }
+    this.state.registers[register] = value;  
   }
+
+  updateMemoryFromUi(hexAddress: any, value: any) {
+    let decimalAddress = this.hex2dec(hexAddress);
+    this.state.data[decimalAddress] = value;
+  }
+
 }

@@ -130,6 +130,13 @@ export class MemoryTableComponent implements OnInit {
     
   }
 
+  onMemoryEdit(event: any)
+  {
+    let value = event.target.value.startsWith('0x') ? event.target.value.slice(2) : event.target.value;
+    let register = event.target.id;
+    this.ideService.updateMemoryFromUi(register, value)
+  }
+
   private refreshDataTableBindings() {
     if (this.filteredDataOptions)
     {
