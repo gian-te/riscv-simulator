@@ -37,6 +37,8 @@ export class CacheTableComponent implements OnInit {
 
   hits: number = 0;
   misses: number = 0;
+  hitRate: number = 0;
+  missRate: number = 0;
 
   @ViewChild('cachePaginator') cachePaginator: MatPaginator;
 
@@ -75,6 +77,12 @@ export class CacheTableComponent implements OnInit {
       )
       .subscribe(newCacheHitTally => {
         this.hits = newCacheHitTally;
+        if (Number(this.misses) > 0 || Number(this.hits) > 0)
+        {
+          this.hitRate = this.hits/ (this.hits + this.misses) * 100
+          this.missRate = this.misses/ (this.hits + this.misses) * 100
+        }        
+
       });
     
       this.ideService.state$
@@ -85,6 +93,12 @@ export class CacheTableComponent implements OnInit {
       )
       .subscribe(newCacheMissTally => {
         this.misses = newCacheMissTally;
+        if (Number(this.misses) > 0 || Number(this.hits) > 0)
+        {
+          this.missRate = this.misses/ (this.hits + this.misses) * 100
+          this.hitRate = this.hits/ (this.hits + this.misses) * 100
+        
+        }
       });
     
      // taga salo ng ide settings, pang divide ng blocks

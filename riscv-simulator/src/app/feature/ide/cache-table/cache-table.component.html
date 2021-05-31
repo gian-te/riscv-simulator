@@ -4,6 +4,8 @@
     <p style="display: inline; float:left; margin-top: 10px;"><b>Cache Memory</b></p>
     <span style="display: inline; float:left; margin-top: 10px; margin-left: 20px;"> Hits: {{ hits }}  </span>
     <span style="display: inline; float:left; margin-top: 10px; margin-left: 20px;"> Misses: {{ misses }}  </span>
+    <span style="display: inline; float:left; margin-top: 10px; margin-left: 20px;"> Cache Hit Rate: {{ hitRate.toFixed(2) + '%' }}  </span>
+    <span style="display: inline; float:left; margin-top: 10px; margin-left: 20px;"> Cache Miss Rate: {{ missRate.toFixed(2)  + '%' }}  </span>
     <form style="display: inline; float:right" class="example-form">
       <mat-form-field class="example-full-width">
         <mat-label>Search by Cache Block...</mat-label>
