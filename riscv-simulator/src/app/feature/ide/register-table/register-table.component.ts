@@ -17,6 +17,13 @@ export class RegisterTableComponent implements OnInit {
 
   }
 
+  onRegisterEdit(event: any)
+  {
+    let value = event.target.value.startsWith('0x') ? event.target.value.slice(2) : event.target.value;
+    let register = event.target.id;
+    this.ideService.updateRegisterFromUi(register, value)
+  }
+
   ngOnInit() {
 
     this.listOfSupportedRegisters = this.ideService.Register_Default_Values;
@@ -45,17 +52,6 @@ export class RegisterTableComponent implements OnInit {
       .subscribe(registerThatWasModified => {
         var elem = document.getElementById(registerThatWasModified);
         blinkingHighlight(elem);
-        // for (let i = 0; i < 3;)
-        // {
-        //   setTimeout(() => {
-        //     elem.style.background = "#ffffb2"
-        //     setTimeout(() => {
-        //       elem.style.background = "none"
-        //       i++;
-        //     }, (200), i);
-        //   }, 500, i);
-          
-        // }
       });
     
     async function blinkingHighlight(elem: any)
@@ -71,5 +67,9 @@ export class RegisterTableComponent implements OnInit {
         i++;
       }
     }
+
+    
   }
+  
+
 }

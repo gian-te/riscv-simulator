@@ -48,6 +48,7 @@ export class IdeState {
 @Injectable()
 export class IdeService extends Store<IdeState> {
 
+
   private assembleSubject = new Subject<any>();
   sendAssembleEvent() {
     // reset counter on assemble
@@ -1306,7 +1307,6 @@ export class IdeService extends Store<IdeState> {
     return true;
   }
 
-
   public convertStringToHex(str): string {
     let num = Number(str);
     let hex = num.toString(16).toUpperCase();
@@ -1354,5 +1354,12 @@ export class IdeService extends Store<IdeState> {
       num = num - maxVal
     }
     return num;
+  }
+
+  updateRegisterFromUi(register: any, value: any) {
+    if (value)
+    {
+      this.state.registers[register] = value;  
+    }
   }
 }

@@ -3,14 +3,16 @@
       <div style="height: 100%; margin: 0px 10px;">
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [0,1,2,3]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [0,1,2,3]" >
           <td>
             <span><b>X{{number}}&nbsp;&nbsp; </b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -20,14 +22,16 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [4,5,6,7]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [4,5,6,7]">
           <td>
             <span><b>X{{number}}&nbsp;&nbsp;</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -37,14 +41,16 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [8,9,10,11]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [8,9,10,11]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -54,14 +60,16 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px;border-collapse: collapse;">
-        <tr *ngFor="let number of [12,13,14,15]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [12,13,14,15]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -71,14 +79,16 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px;border-collapse: collapse;">
-        <tr *ngFor="let number of [16,17,18,19]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [16,17,18,19]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -88,14 +98,16 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [20,21,22,23]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [20,21,22,23]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
 
@@ -106,14 +118,16 @@
 
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [24,25,26,27]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [24,25,26,27]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
+            id="{{ 'X' + number }}"
             type="text"
-            placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
             aria-label="InstructionAddress"
             matInput>
             
@@ -123,17 +137,19 @@
       </table>
 
       <table border="1px solid" style="display:inline-block; margin-right: 16px; border-collapse: collapse;">
-        <tr *ngFor="let number of [28,29,30,31]" [attr.id]="'X' + number">
+        <tr *ngFor="let number of [28,29,30,31]">
           <td>
             <span><b>X{{number}}</b></span>
           </td>
           <td style="width: 105px">
             <input *ngIf="listOfSupportedRegisters"
-              type="text"
-              placeholder="{{ '0x' + listOfSupportedRegisters['X' + number] }}"
-              aria-label="InstructionAddress"
-              matInput>
-            
+            id="{{ 'X' + number }}"
+            type="text"
+            (keyup)="onRegisterEdit($event)"
+            [value]="'0x' + listOfSupportedRegisters['X' + number]"
+            aria-label="InstructionAddress"
+            matInput>
+          
             <!-- <span *ngIf="listOfSupportedRegisters">{{ '0x' + listOfSupportedRegisters['X' + number] }}</span> -->
           </td> 
         </tr>

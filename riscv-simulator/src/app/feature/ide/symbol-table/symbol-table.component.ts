@@ -15,7 +15,7 @@ export class SymbolTableComponent implements OnInit {
 
   filteredSymbolOptions: SymbolModel[];
 
-  symbolSource: any;
+  symbolSource: any = new MatTableDataSource<SymbolModel>([]);
   @ViewChild('symbolPaginator') symbolPaginator: MatPaginator;
 
   constructor(private ideService: IdeService) {

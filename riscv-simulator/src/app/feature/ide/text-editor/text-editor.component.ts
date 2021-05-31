@@ -29,6 +29,11 @@ export class TextEditorComponent implements OnInit {
 
   .text
     main:
+    addi x10, x0, 0x08
+    addi x11, x0, 0x18
+    blt x10, x11, L1
+    addi x9, x0, 0x08
+    L1: addi x12, x0, 0x07
     LB x10, 0(x5)
     LB x11, 1(x5)
     LW x31, 0(x5)

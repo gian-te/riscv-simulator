@@ -27,13 +27,13 @@ export class CacheTableComponent implements OnInit {
       cacheBlockSize: '4'    // 4 words per block
     };
   blocks: any = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
-  unique: any;
+  unique: any = [];
   
   myCacheBlockControl = new FormControl();
 
   filteredCacheBlockOptions: CacheModel[];
 
-  cacheSource: any;
+  cacheSource: any =  new MatTableDataSource<CacheModel>([]);;
 
   hits: number = 0;
   misses: number = 0;
@@ -77,7 +77,12 @@ export class CacheTableComponent implements OnInit {
       )
       .subscribe(newCacheHitTally => {
         this.hits = newCacheHitTally;
-        if (Number(this.misses) > 0 || Number(this.hits) > 0)
+        if (Number(this.hits) == 0)
+        {
+          this.hitRate = 0;
+          
+        }
+        else if (Number(this.misses) > 0 || Number(this.hits) > 0) // avoid divide by 0
         {
           this.hitRate = this.hits/ (this.hits + this.misses) * 100
           this.missRate = this.misses/ (this.hits + this.misses) * 100
@@ -93,12 +98,17 @@ export class CacheTableComponent implements OnInit {
       )
       .subscribe(newCacheMissTally => {
         this.misses = newCacheMissTally;
-        if (Number(this.misses) > 0 || Number(this.hits) > 0)
+        if (Number(this.misses) == 0)
+        {
+          this.missRate = 0;
+          
+        }
+        else if (Number(this.misses) > 0 || Number(this.hits) > 0) // avoid divide by 0
         {
           this.missRate = this.misses/ (this.hits + this.misses) * 100
           this.hitRate = this.hits/ (this.hits + this.misses) * 100
-        
         }
+       
       });
     
      // taga salo ng ide settings, pang divide ng blocks
