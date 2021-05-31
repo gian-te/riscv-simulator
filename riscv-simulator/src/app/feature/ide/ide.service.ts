@@ -387,13 +387,13 @@ export class IdeService extends Store<IdeState> {
     return retVal;
   }
 
-  private updateCache(mb, cb, addr) {
+  private updateCache(mb, cbs, addr) {
     // 4 words, but in the form of bytes. 1 word = 4 bytes, so 16 bytes will be cached in a cache block
-    const blockToBeCached = this.state.data.slice(mb * cb, (mb + 1) * cb)
+    const blockToBeCached = this.state.data.slice(mb * cbs, (mb + 1) * cbs)
     const cacheBlock = mb % Number(this.state.ideSettings.numCacheBlocks)
-    let that = this;
+
     blockToBeCached.forEach((byte, i) => {
-      this.state.cache[cacheBlock * Number(that.state.ideSettings.cacheBlockSize) * 4 + i] = {
+      this.state.cache[cacheBlock * cbs + i] = {
         validBit: '0',
         tag: this.dec2hex(addr + (4 * i), 8).slice(0, 4),
         data: byte,
@@ -416,8 +416,7 @@ export class IdeService extends Store<IdeState> {
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
     // check if cache hit / miss:
-    if (!this.isInCache(memoryBlock))
-    {
+    if (!this.isInCache(memoryBlock)) {
       this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
@@ -442,8 +441,7 @@ export class IdeService extends Store<IdeState> {
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
     // check if cache hit / miss:
-    if (!this.isInCache(memoryBlock))
-    {
+    if (!this.isInCache(memoryBlock)) {
       this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
@@ -469,8 +467,7 @@ export class IdeService extends Store<IdeState> {
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
     // check if cache hit / miss:
-    if (!this.isInCache(memoryBlock))
-    {
+    if (!this.isInCache(memoryBlock)) {
       this.updateCache(memoryBlock, cacheBlockSizeInBytes, effectiveAddress)
     }
 
@@ -482,6 +479,19 @@ export class IdeService extends Store<IdeState> {
 
     this.state.registers[rd] = wordHex;
     console.log(this.state.registers)
+  }
+
+  private cacheWriteThrough(mb, cbs, addr, dataByte) {
+    const cacheBlock = mb % Number(this.state.ideSettings.numCacheBlocks)
+    const cacheIndexInBlock = addr - (mb * cbs)
+
+    this.state.cache[cacheBlock * cbs + cacheIndexInBlock] = {
+      validBit: '0',
+      tag: this.dec2hex(addr + (4 * cacheIndexInBlock), 8).slice(0, 4),
+      data: dataByte,
+      cacheBlock: cacheBlock.toString(),
+      memoryBlock: mb.toString()
+    }
   }
 
   // with cache checking
@@ -497,6 +507,13 @@ export class IdeService extends Store<IdeState> {
     const byteHex = wordHex.slice(6, 8)
 
     this.state.data[effectiveAddress] = byteHex
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byteHex)
+    }
 
     console.log(this.state.data)
   }
@@ -516,6 +533,14 @@ export class IdeService extends Store<IdeState> {
 
     this.state.data[effectiveAddress] = byte1Hex
     this.state.data[effectiveAddress + 1] = byte2Hex
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byte1Hex)
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 1, byte2Hex)
+    }
 
     console.log(this.state.data)
   }
@@ -539,6 +564,16 @@ export class IdeService extends Store<IdeState> {
     this.state.data[effectiveAddress + 1] = byte2Hex
     this.state.data[effectiveAddress + 2] = byte3Hex
     this.state.data[effectiveAddress + 3] = byte4Hex
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byte1Hex)
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 1, byte2Hex)
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 2, byte3Hex)
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 3, byte4Hex)
+    }
 
     console.log(this.state.data)
   }
@@ -1290,8 +1325,8 @@ export class IdeService extends Store<IdeState> {
   }
 
   public bin2hex(bin, sign, n) {
-   
-    
+
+
     // if (sign === '0') {
     //   return (sign.repeat(n * 4) + parseInt(bin, 2)).toString(16).substr(-n).toUpperCase();
     // } else {

@@ -41,6 +41,7 @@ export class TextEditorComponent implements OnInit {
     LB x1, E(x5)
     LB x3, 15(x5)
     LW x29, F(x5)
+    SW x11, 0(x5)
   `
 
   ngOnInit() {
