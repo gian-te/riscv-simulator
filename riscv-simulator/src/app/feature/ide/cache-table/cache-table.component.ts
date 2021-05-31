@@ -27,7 +27,8 @@ export class CacheTableComponent implements OnInit {
       cacheBlockSize: '4'    // 4 words per block
     };
   blocks: any = Array(Number(this.ideSettings.numCacheBlocks)).fill(0).map((x,i)=>i);
-
+  unique: any;
+  
   myCacheBlockControl = new FormControl();
 
   filteredCacheBlockOptions: CacheModel[];
@@ -61,6 +62,7 @@ export class CacheTableComponent implements OnInit {
       .subscribe(newCacheItems => {
         that.blocks = []
         that.blocks = newCacheItems;
+        that.unique = [...new Set(newCacheItems.filter(item => item.cacheBlock).map(item => item.cacheBlock))];
         that.filteredCacheBlockOptions = this.blocks;
         that.refreshCacheTableBindings();
       });
