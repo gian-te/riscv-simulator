@@ -1,3 +1,4 @@
+import { JsonPipe } from '@angular/common';
 import { variable } from '@angular/compiler/src/output/output_ast';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -307,6 +308,7 @@ export class IdeService extends Store<IdeState> {
       ...this.state,
       registers: this.state.registers,
       modifiedRegister: affectedRegister,
+      data: JSON.parse(JSON.stringify(this.state.data)),
       cache: JSON.parse(JSON.stringify(this.state.cache)) // force change detection here by assigning a deep copy of the this.state.cache object.
     })
   }
@@ -412,7 +414,7 @@ export class IdeService extends Store<IdeState> {
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
-    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].value.slice(2) : ma;
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
@@ -438,7 +440,7 @@ export class IdeService extends Store<IdeState> {
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
-    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].value.slice(2) : ma;
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
@@ -465,7 +467,7 @@ export class IdeService extends Store<IdeState> {
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
-    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].value.slice(2) : ma;
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
@@ -505,7 +507,8 @@ export class IdeService extends Store<IdeState> {
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
-    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const ma = instruction[2].token.slice(0, indexOpeningBracket)
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const wordHex = this.state.registers[rs2]
@@ -529,7 +532,8 @@ export class IdeService extends Store<IdeState> {
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
-    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const ma = instruction[2].token.slice(0, indexOpeningBracket)
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const wordHex = this.state.registers[rs2]
@@ -556,7 +560,8 @@ export class IdeService extends Store<IdeState> {
     const indexOpeningBracket = instruction[2].token.indexOf('(')
     const indexClosingBracket = instruction[2].token.indexOf(')')
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
-    const memoryAddress = instruction[2].token.slice(0, indexOpeningBracket)
+    const ma = instruction[2].token.slice(0, indexOpeningBracket)
+    const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
     const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
 
     const wordHex = this.state.registers[rs2]
@@ -807,10 +812,7 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       data: newData,
-      symbols: [
-        ...this.state.symbols,
-        ...newSymbols
-      ],
+      symbols: JSON.parse(JSON.stringify(newSymbols)),
       symbolByName: normalizeSymbol
     });
   }
@@ -1383,6 +1385,17 @@ export class IdeService extends Store<IdeState> {
   updateMemoryFromUi(hexAddress: any, value: any) {
     let decimalAddress = this.hex2dec(hexAddress);
     this.state.data[decimalAddress] = value;
+
+    const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
+    const memoryBlock = Math.floor(decimalAddress / cacheBlockSizeInBytes)
+
+    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+      this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, decimalAddress, value)
+      this.setState({
+        ...this.state,
+        cache: JSON.parse(JSON.stringify(this.state.cache)) // force change detection here by assigning a deep copy of the this.state.cache object.
+      })
+    }
   }
 
 }
