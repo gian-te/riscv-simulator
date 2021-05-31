@@ -1,3 +1,9 @@
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #000000;
+  opacity: 1; /* Firefox */
+}
+
+
 .mat-card-header  {
     font-size: 14px;
     font-weight: 500;
