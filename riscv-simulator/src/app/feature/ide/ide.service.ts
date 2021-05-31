@@ -1,3 +1,4 @@
+import { variable } from '@angular/compiler/src/output/output_ast';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject, UnsubscriptionError } from 'rxjs';
@@ -1041,11 +1042,13 @@ export class IdeService extends Store<IdeState> {
     /*
     * Grammar/Productions:
     * E => Line
-    * Line => [type] [value]                    // production rule 1
+    * Line => [type] [value]                        // production rule 1
+    * Line => [type] [values]                       // production rule 2
     */
     let pattern1 = ['type', 'value'];
-
+    let pattern2 = ['type', 'values'];
     let pattern1Match = false;
+    let pattern2Match = false;
     let syntaxError = false;
 
     for (let i = 0; i < variables.length; i++) {
@@ -1067,11 +1070,18 @@ export class IdeService extends Store<IdeState> {
         lineTokens.push(token.toLowerCase());
         lineTokenTypes.push(tokenType);
 
-        // pattern 1 checking: [instruction] [register],[register]   
+        // pattern 1 checking: [name], [type], [value]  
         if (this.patternMatch(lineTokenTypes, ['type', 'value'])) {
           pattern1Match = true;
-        } else pattern1Match = false;
-
+        }
+        else if (variableTokens.length > 2 && tokenType == 'value' && variableLines.length != 0)
+        {
+          pattern2Match = true;
+        }
+        else
+        {
+          pattern1Match = false;  
+        }
 
         if (pattern1Match) {
           variableLines.push({
@@ -1082,6 +1092,19 @@ export class IdeService extends Store<IdeState> {
           lineTokenTypes = [];
           lineTokens = [];
           pattern1Match = false;
+        }
+        else if (pattern2Match)
+        {
+          let lastVariable = variableLines[variableLines.length - 1];
+
+          variableLines.push({
+            ...lastVariable,
+            'name': '',
+            'value': lineTokens[0]
+          });
+          lineTokenTypes = [];
+          lineTokens = [];
+          pattern2Match = false;
         }
         else if (this.patternSimilar(lineTokenTypes, pattern1))  // if approaching exact match, continue
         {
@@ -1099,7 +1122,7 @@ export class IdeService extends Store<IdeState> {
 
       if (syntaxError) break; //break outer
     }
-    let duplicateVariableNames = (new Set(variableLines.map(a => a.name))).size !== variableLines.length;
+    let duplicateVariableNames = (new Set(variableLines.map(a => a ?? a.name))).size !== variableLines.length;
     if (duplicateVariableNames) { alert('Compilation error in the .data section. There seems to be a duplicate name in the variables.') }
     this.error = syntaxError || duplicateVariableNames;
     return variableLines;
