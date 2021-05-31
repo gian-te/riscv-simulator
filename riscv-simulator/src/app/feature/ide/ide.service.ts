@@ -390,9 +390,9 @@ export class IdeService extends Store<IdeState> {
     // 4 words, but in the form of bytes. 1 word = 4 bytes, so 16 bytes will be cached in a cache block
     const blockToBeCached = this.state.data.slice(mb * cb, (mb + 1) * cb)
     const cacheBlock = mb % Number(this.state.ideSettings.numCacheBlocks)
-
+    let that = this;
     blockToBeCached.forEach((byte, i) => {
-      this.state.cache[cacheBlock + i] = {
+      this.state.cache[cacheBlock * Number(that.state.ideSettings.cacheBlockSize) * 4 + i] = {
         validBit: '0',
         tag: this.dec2hex(addr + (4 * i), 8).slice(0, 4),
         data: byte,
