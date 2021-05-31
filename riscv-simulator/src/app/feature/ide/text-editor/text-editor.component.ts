@@ -18,7 +18,7 @@ export class TextEditorComponent implements OnInit {
   code = `  .globl main
 
   .data
-    var1: .byte 0x88
+    var1: .byte 0x88, 0x77, 0x66, 0x2f, 0xDF
     var2: .byte 0x99
     var3: .word 0xBBAA
     var4: .byte 0xFF
