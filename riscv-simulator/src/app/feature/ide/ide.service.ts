@@ -651,11 +651,22 @@ export class IdeService extends Store<IdeState> {
 
   public runAll(): void {
     console.log('running all steps');
-    let n = this.state.instructions.length
-    while (n !== 0) {
-      this.runOnce();
-      n--
+    try {
+      while (true)
+      {
+        this.runOnce();
+      }
     }
+    catch (ex)
+    {
+      // console.log(ex);
+        // swallow
+    }
+    // let n = this.state.instructions.length
+    // while (n !== 0) {
+    //   this.runOnce();
+    //   n--
+    // }
   }
 
   // Sasalohin ni memory table (instructions)

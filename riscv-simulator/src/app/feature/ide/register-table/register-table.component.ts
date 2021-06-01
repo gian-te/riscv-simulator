@@ -39,7 +39,7 @@ export class RegisterTableComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(updatedRegisters => {
-        console.log('list of registers updated');
+        // console.log('list of registers updated');
         this.listOfSupportedRegisters = updatedRegisters;
       });
     
@@ -58,7 +58,7 @@ export class RegisterTableComponent implements OnInit {
       const timer = ms => new Promise(res => setTimeout(res, ms))
 
       for (let i = 0; i < 3;) {
-        console.log(i);
+        // console.log(i);
         elem.style.background = "#ffffb2"
         await timer(200); // then the created Promise can be awaited
         elem.style.background = "none"
