@@ -231,7 +231,8 @@ export class IdeService extends Store<IdeState> {
         memoryBlock: ''
       }),
       cacheHit: 0,
-      cacheMiss: 0
+      cacheMiss: 0,
+      modifiedRegister: null
     })
   }
 
