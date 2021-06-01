@@ -415,7 +415,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -441,7 +441,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -468,7 +468,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -509,7 +509,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const wordHex = this.state.registers[rs2]
     const byteHex = wordHex.slice(6, 8)
@@ -534,7 +534,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const wordHex = this.state.registers[rs2]
     const byte1Hex = wordHex.slice(6, 8)
@@ -562,7 +562,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
+    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + parseInt(memoryAddress, 16);
 
     const wordHex = this.state.registers[rs2]
     const byte1Hex = wordHex.slice(6, 8)
