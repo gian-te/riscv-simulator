@@ -835,7 +835,8 @@ export class IdeService extends Store<IdeState> {
 
     console.log('setting code to: ' + newCode);
 
-    const codeList: string[] = newCode.replace(/(\t|\n)/g, " ").replace(/,/g, "").split(" ").filter(_ => !!_)
+    // modified to handle code with no space between commas
+    const codeList: string[] = newCode.replace(/(\t|\n)/g, " ").replace(/,/g, " ").split(" ").filter(_ => !!_)
     console.log('parsing', codeList)
 
     let section = ''
@@ -913,6 +914,10 @@ export class IdeService extends Store<IdeState> {
     if (!this.error) {
       this.updateData(variableLines);
     }
+    else {
+      // do not cause an exception in the lines below
+      return;
+    }
 
     let codeLines = this.parseTextSection(codeBySection);
     console.log(codeLines); // gagawin pa tong opcode
@@ -926,6 +931,11 @@ export class IdeService extends Store<IdeState> {
     var instructionsIn32BitFormat = this.parseLinesTo32Bits(codeLines);
     if (!this.error) {
       this.updateInstructions(instructionsIn32BitFormat);
+    }
+    else
+    {
+      // do not cause an exception in the lines below
+      return;
     }
 
     // reset registers on assemble
@@ -1127,9 +1137,9 @@ export class IdeService extends Store<IdeState> {
       }
 
       if (syntaxError) break; //break outer
-    }
-    let duplicateVariableNames = (new Set(variableLines.map(a => a ?? a.name))).size !== variableLines.length;
-    if (duplicateVariableNames) { alert('Compilation error in the .data section. There seems to be a duplicate name in the variables.') }
+    } 
+    let duplicateVariableNames = (new Set(variableLines.filter(a => a.name).map(item => item.name))).size !== variableLines.filter(item => item.name).length;
+    if (duplicateVariableNames) { alert('Compilation error in the .data section. Check if there is a duplicate variable name, or if the tokens are spaced correctly.') }
     this.error = syntaxError || duplicateVariableNames;
     return variableLines;
   }
