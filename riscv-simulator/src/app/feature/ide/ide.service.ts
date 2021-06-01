@@ -415,7 +415,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -441,7 +441,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -468,7 +468,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
@@ -509,7 +509,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const wordHex = this.state.registers[rs2]
     const byteHex = wordHex.slice(6, 8)
@@ -534,7 +534,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const wordHex = this.state.registers[rs2]
     const byte1Hex = wordHex.slice(6, 8)
@@ -562,7 +562,7 @@ export class IdeService extends Store<IdeState> {
     const rs1 = instruction[2].token.slice(indexOpeningBracket + 1, indexClosingBracket);
     const ma = instruction[2].token.slice(0, indexOpeningBracket)
     const memoryAddress = this.state.symbolByName[ma.toLowerCase()] ? this.state.symbolByName[ma.toLowerCase()].address : ma;
-    const effectiveAddress = this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress);
+    const effectiveAddress = Math.abs(this.hex2dec(this.state.registers[rs1]) + this.hex2dec(memoryAddress));
 
     const wordHex = this.state.registers[rs2]
     const byte1Hex = wordHex.slice(6, 8)
@@ -932,8 +932,7 @@ export class IdeService extends Store<IdeState> {
     if (!this.error) {
       this.updateInstructions(instructionsIn32BitFormat);
     }
-    else
-    {
+    else {
       // do not cause an exception in the lines below
       return;
     }
@@ -1090,13 +1089,11 @@ export class IdeService extends Store<IdeState> {
         if (this.patternMatch(lineTokenTypes, ['type', 'value'])) {
           pattern1Match = true;
         }
-        else if (variableTokens.length > 2 && tokenType == 'value' && variableLines.length != 0)
-        {
+        else if (variableTokens.length > 2 && tokenType == 'value' && variableLines.length != 0) {
           pattern2Match = true;
         }
-        else
-        {
-          pattern1Match = false;  
+        else {
+          pattern1Match = false;
         }
 
         if (pattern1Match) {
@@ -1109,8 +1106,7 @@ export class IdeService extends Store<IdeState> {
           lineTokens = [];
           pattern1Match = false;
         }
-        else if (pattern2Match)
-        {
+        else if (pattern2Match) {
           let lastVariable = variableLines[variableLines.length - 1];
 
           variableLines.push({
@@ -1137,7 +1133,7 @@ export class IdeService extends Store<IdeState> {
       }
 
       if (syntaxError) break; //break outer
-    } 
+    }
     let duplicateVariableNames = (new Set(variableLines.filter(a => a.name).map(item => item.name))).size !== variableLines.filter(item => item.name).length;
     if (duplicateVariableNames) { alert('Compilation error in the .data section. Check if there is a duplicate variable name, or if the tokens are spaced correctly.') }
     this.error = syntaxError || duplicateVariableNames;
