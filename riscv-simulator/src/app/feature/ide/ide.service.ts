@@ -809,6 +809,9 @@ export class IdeService extends Store<IdeState> {
       return acc;
     }, {})
 
+    this.state.symbols = newSymbols;
+    this.state.symbolByName = normalizeSymbol;
+
     this.setState({
       ...this.state,
       data: newData,
@@ -1205,7 +1208,7 @@ export class IdeService extends Store<IdeState> {
       else if (token.includes('(') && token.includes(')')) tokenType = 'address'; // lol happy path
       else if (token.includes('0X') || token.match(/^\-?(\d*)$/)) tokenType = 'immediate'; // lol happy path
       else if (token.slice(-1) === ':') {
-        if (symbolList.includes(token.slice(0, -1))) {
+        if (tokens.includes(token.slice(0, -1))) {
           tokenType = 'branch';
         } else {
           alert(`${token.slice(0, -1)} not found in symbol table`);
