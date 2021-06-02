@@ -520,7 +520,7 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+    if (!this.isInCache(memoryBlock)) {
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byteHex)
     }
 
@@ -547,7 +547,7 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+    if (!this.isInCache(memoryBlock)) {
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byte1Hex)
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 1, byte2Hex)
     }
@@ -579,7 +579,7 @@ export class IdeService extends Store<IdeState> {
     const cacheBlockSizeInBytes = Number(this.state.ideSettings.cacheBlockSize) * 4;
     const memoryBlock = Math.floor(effectiveAddress / cacheBlockSizeInBytes)
 
-    if (!!this.state.cache.find(_ => _.memoryBlock === memoryBlock.toString())) {
+    if (!this.isInCache(memoryBlock)) {
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress, byte1Hex)
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 1, byte2Hex)
       this.cacheWriteThrough(memoryBlock, cacheBlockSizeInBytes, effectiveAddress + 2, byte3Hex)
@@ -652,15 +652,13 @@ export class IdeService extends Store<IdeState> {
   public runAll(): void {
     console.log('running all steps');
     try {
-      while (true)
-      {
+      while (true) {
         this.runOnce();
       }
     }
-    catch (ex)
-    {
+    catch (ex) {
       // console.log(ex);
-        // swallow
+      // swallow
     }
     // let n = this.state.instructions.length
     // while (n !== 0) {
