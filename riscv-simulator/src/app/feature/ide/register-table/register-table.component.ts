@@ -46,7 +46,8 @@ export class RegisterTableComponent implements OnInit {
       this.ideService.state$
       .pipe(
         map(state => state.modifiedRegister),
-        filter(data => data != null)
+        filter(data => data != null),
+        distinctUntilChanged()
       )
       .subscribe(registerThatWasModified => {
         var elem = document.getElementById(registerThatWasModified);

@@ -308,7 +308,7 @@ export class IdeService extends Store<IdeState> {
     this.setState({
       ...this.state,
       registers: this.state.registers,
-      modifiedRegister: affectedRegister,
+      modifiedRegister: JSON.parse(JSON.stringify(affectedRegister)),
       data: JSON.parse(JSON.stringify(this.state.data)),
       cache: JSON.parse(JSON.stringify(this.state.cache)) // force change detection here by assigning a deep copy of the this.state.cache object.
     })
