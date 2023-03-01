@@ -1,4 +1,5 @@
 # RiscvSimulator
+See it live: https://riscv-simulator.azurewebsites.net/
 
 This project is a compiler and simulator for the RISC-V RV32I Instruction Set Architecture. This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.5.
 
